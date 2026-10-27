@@ -1,0 +1,14 @@
+{
+  "EAMedia-1.0.2.jar": {
+    "bytes": 764453454,
+    "tvModelSha256": "5d8bc71a6f4f78be1a1b90fa12da80c6b379a57566926693477c6f53a8d81b90",
+    "modelMatchesGeneratedSource": true,
+    "version": "1.0.2"
+  },
+  "EAMedia-1.0.2-server.jar": {
+    "bytes": 371078,
+    "tvModelSha256": "5d8bc71a6f4f78be1a1b90fa12da80c6b379a57566926693477c6f53a8d81b90",
+    "modelMatchesGeneratedSource": true,
+    "version": "1.0.2"
+  }
+}

@@ -52,7 +52,10 @@ for kind in ["tv","jukebox"]:
   for i in range(7):m.box('Red',-.28+i*.085,.12,-.32,.04,.035,.02)
 
  m.box('Input',-.47,-.39,-.08,.05,.15,.16);m.box('Output',.42,-.39,-.08,.05,.15,.16)
- m.box('Indicator',-.02,.36,-.25,.04,.035,.025)
+ # The TV LED belongs on the lower bezel, below the browser picture, and
+ # only 3 mm proud of its case. The jukebox keeps its original top indicator.
+ if kind=='tv':m.box('Indicator',-.015,-.181,-.103,.03,.008,.003)
+ else:m.box('Indicator',-.02,.36,-.25,.04,.035,.025)
  # Electrical front uses local +Z. Reflect only front/back so the blue input
  # stays on the existing left terminal; reverse winding to preserve outward normals.
  m.p={part:[[(x,y,-z) for x,y,z in reversed(face)] for face in faces] for part,faces in m.p.items()}
