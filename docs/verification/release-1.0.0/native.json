@@ -1,0 +1,43 @@
+{
+  "passed": [
+    "Actual TV Go button reaches the server from a browser screen with no inventory menu",
+    "Real Chromium decodes moving WebM video and nonzero audio samples from an HTTP stream; static cabinet is baked",
+    "Real browser mouse clicks and typed characters pass through the TV screen to webpage controls",
+    "Closing controls leaves the same browser and video playing on the in-world TV",
+    "Actual TV volume controls update server settings without an inventory container",
+    "Loss of actual placed-cable power closes Chromium and stops playback",
+    "Restoring electrical power recreates the browser and resumes the selected page",
+    "Leaving the 32-block viewing range releases the browser and its texture/audio resources",
+    "Server rejects media control packets from outside the eight-block interaction range",
+    "Actual jukebox Play button opens a positional Minecraft stream from HTTPS audio in the addon"
+  ],
+  "measurements": {
+    "browserPlayback": {
+      "time": 1.35174,
+      "paused": false,
+      "width": 320,
+      "audioTracks": 1,
+      "muted": false,
+      "volume": 0.5681176947438429,
+      "contextState": "running",
+      "rms": 0.05060529253745543,
+      "clicks": 0,
+      "input": ""
+    },
+    "paintedFrames": 10,
+    "powerWatts": 149.9977225426852,
+    "interactivePage": {
+      "time": 4.533134,
+      "paused": false,
+      "width": 320,
+      "audioTracks": 1,
+      "muted": false,
+      "volume": 0.5681176947438429,
+      "contextState": "running",
+      "rms": 0.04977249433879057,
+      "clicks": 1,
+      "input": "TV!"
+    },
+    "jukeboxStreams": 1
+  }
+}

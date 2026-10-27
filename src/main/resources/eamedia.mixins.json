@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "mods.eamedia.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["BundledChromiumMixin"],
+  "injectors": {"defaultRequire": 1}
+}

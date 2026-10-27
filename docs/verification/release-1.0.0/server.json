@@ -1,0 +1,12 @@
+{
+  "coreVersion": "3.0.60",
+  "addonVersion": "1.0.0",
+  "variant": "EAMedia-1.0.0-server.jar",
+  "addonBytes": 359334,
+  "started": true,
+  "stoppedAfterTicks": 40,
+  "cleanShutdown": true,
+  "browserInitialized": false,
+  "containsChromiumArchives": false,
+  "containsMediaExecutables": false
+}

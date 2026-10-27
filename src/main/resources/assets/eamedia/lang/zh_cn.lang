@@ -1,0 +1,74 @@
+#<ELN_LANGFILE_V1_1>
+
+# Appearing in multiple source files
+Supply\:_%1$;_%2$;_volume_%3$_percent=Supply: %1$; %2$; volume %3$ percent
+Waiting_for_electrical_power=Waiting for electrical power
+
+# Jade integration settings
+config.jade.plugin_eln.ghost_node=Multiblock parts
+config.jade.plugin_eln.six_node=Surface-mounted devices
+config.jade.plugin_eln.transparent_node=Machines
+
+# src/main/kotlin/mods/eamedia/BundledChromium.kt
+Verifying_bundled_Chromium...=Verifying bundled Chromium...
+
+# src/main/kotlin/mods/eamedia/JukeboxScreen.kt
+Disable=Disable
+Enable=Enable
+HTTPS_audio_or_YouTube_address=HTTPS audio or YouTube address
+Play_/_restart=Play / restart
+Powered_Web_Jukebox=Powered Web Jukebox
+Reset_trip=Reset trip
+Stop=Stop
+Use_a_complete_HTTPS_audio_or_YouTube_address=Use a complete HTTPS audio or YouTube address
+
+# src/main/kotlin/mods/eamedia/MediaClient.kt
+Blue_left_or_bottom\:_power_input;_120/240_V_cords_or_fixed_cables=Blue left or bottom: power input; 120/240 V cords or fixed cables
+Interactive_Chromium_TV\:_webpages,_video_and_stereo_audio=Interactive Chromium TV: webpages, video and stereo audio
+Powered_HTTPS_/_YouTube_jukebox_with_bundled_media_tools=Powered HTTPS / YouTube jukebox with bundled media tools
+
+# src/main/kotlin/mods/eamedia/MediaElement.kt
+Disabled=已禁用
+Enabled=Enabled
+Power=功率
+Status=Status
+Supply=Supply
+
+# src/main/kotlin/mods/eamedia/MediaKind.kt
+Powered_Browser_Television.name=Powered Browser Television
+Powered_Web_Jukebox.name=Powered Web Jukebox
+
+# src/main/kotlin/mods/eamedia/TelevisionBrowser.kt
+Browser_could_not_start;_turn_the_TV_off_and_on_to_retry=Browser could not start; turn the TV off and on to retry
+Browser_engine_unavailable;_check_MCEF_setup=Browser engine unavailable; check MCEF setup
+Browser_ready;_click_the_picture_to_interact=Browser ready; click the picture to interact
+Enter_a_webpage_or_video_address_and_turn_on_the_TV=Enter a webpage or video address and turn on the TV
+Loading_webpage...=Loading webpage...
+Two_nearby_TVs_are_already_active=Two nearby TVs are already active
+Waiting_for_viewer_within_32_blocks=Waiting for viewer within 32 blocks
+
+# src/main/kotlin/mods/eamedia/TelevisionScreen.kt
+Go=Go
+Powered_Browser_Television=Powered Browser Television
+Reload=Reload
+Share_page=Share page
+TV_off=TV off
+TV_on=TV on
+Use_a_complete_HTTP_or_HTTPS_address=Use a complete HTTP or HTTPS address
+Web_address=Web address
+
+# src/main/kotlin/mods/eamedia/WebJukeboxAudio.kt
+Audio_unavailable;_check_link,_HTTPS_access_and_media_tools=Audio unavailable; check link, HTTPS access and media tools
+Converting_selected_audio...=Converting selected audio...
+Could_not_prepare_bundled_YouTube_tools=Could not prepare bundled YouTube tools
+Could_not_prepare_bundled_audio_decoder=Could not prepare bundled audio decoder
+Downloading_selected_audio...=Downloading selected audio...
+Extracting_bundled_media_tools...=Extracting bundled media tools...
+Four_web_audio_players_are_already_active=Four web audio players are already active
+Paste_a_HTTPS_audio_/_YouTube_link_and_press_Play=Paste a HTTPS audio / YouTube link and press Play
+Playing_web_audio=Playing web audio
+Preparing_web_audio...=Preparing web audio...
+Song_finished;_press_Play_to_restart=Song finished; press Play to restart
+Waiting_for_listener_within_32_blocks=Waiting for listener within 32 blocks
+Web_audio_muted;_check_volume_/_Records_slider=Web audio muted; check volume / Records slider
+Web_audio_stopped=Web audio stopped

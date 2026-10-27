@@ -1,0 +1,51 @@
+{
+  "core": {
+    "bytes": 20458804,
+    "sha256": "9b4a5afb0276f6be0a57dc092802f58cd2d2694227d6e16c1fae6ff74315af65",
+    "nested": [
+      "META-INF/jarjar/commons-math3-3.6.1.jar",
+      "META-INF/jarjar/commons-numbers-core-1.2.jar",
+      "META-INF/jarjar/semver4j-4.3.0.jar"
+    ],
+    "mediaTools": 0,
+    "chromiumParts": 0,
+    "mediaClasses": 0,
+    "mediaRecipesPresent": false,
+    "mediaModelsPresent": false
+  },
+  "clientAddon": {
+    "bytes": 764441710,
+    "sha256": "c94c0c20e98d5476393a6a703a20951b9def631fe47756906c5fe7952647b21e",
+    "nested": [
+      "META-INF/jarjar/mcef-neoforge-2.1.6-1.21.1.jar"
+    ],
+    "mediaTools": 39,
+    "chromiumParts": 12,
+    "mediaClasses": 39,
+    "mediaRecipesPresent": true,
+    "mediaModelsPresent": true,
+    "mcefSha512": "ef975f64d100ad1f774e04c8cc31d06b99c5c72196e0ee270008a71148b90ddf43d72a103224e5536f58b16f984f263b45c96dd8df0b722c2ee63526baf61195",
+    "chromiumPlatforms": [
+      "linux_amd64",
+      "windows_amd64",
+      "macos_amd64",
+      "macos_arm64"
+    ],
+    "allChromiumArchiveHashesVerified": true
+  },
+  "serverAddon": {
+    "bytes": 359334,
+    "sha256": "ad2b22202a620b6bf2fa7f64ce2baccefa83c249abc541a332ecc5909511623b",
+    "nested": [
+      "META-INF/jarjar/mcef-neoforge-2.1.6-1.21.1.jar"
+    ],
+    "mediaTools": 0,
+    "chromiumParts": 0,
+    "mediaClasses": 39,
+    "mediaRecipesPresent": true,
+    "mediaModelsPresent": true,
+    "mcefSha512": "ef975f64d100ad1f774e04c8cc31d06b99c5c72196e0ee270008a71148b90ddf43d72a103224e5536f58b16f984f263b45c96dd8df0b722c2ee63526baf61195"
+  },
+  "oldCoreJarBytes": 295355610,
+  "coreReductionPercent": 93.07
+}

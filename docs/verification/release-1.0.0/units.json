@@ -1,0 +1,42 @@
+[
+  {
+    "name": "mods.eamedia.WebJukeboxTest",
+    "tests": "3",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "time": "0.005"
+  },
+  {
+    "name": "mods.eamedia.BundledMediaRuntimeTest",
+    "tests": "4",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "time": "3.309"
+  },
+  {
+    "name": "mods.eamedia.AddonMigrationTest",
+    "tests": "2",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "time": "0.029"
+  },
+  {
+    "name": "mods.eamedia.TelevisionTest",
+    "tests": "4",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "time": "0.044"
+  },
+  {
+    "name": "mods.eamedia.BundledChromiumTest",
+    "tests": "4",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "time": "13.964"
+  }
+]

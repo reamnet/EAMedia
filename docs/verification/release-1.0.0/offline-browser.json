@@ -1,0 +1,9 @@
+{
+  "platform": "linux_amd64",
+  "downloadMirror": "http://127.0.0.1:9/unavailable",
+  "skipDownload": false,
+  "freshCacheInstalledLocally": true,
+  "cachedFilesVerifiedLocally": true,
+  "chromiumInitialized": true,
+  "logEvidence": "EAMedia verified local bundled Chromium for linux_amd64; no runtime download"
+}

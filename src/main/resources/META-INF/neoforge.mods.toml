@@ -1,0 +1,49 @@
+modLoader="kotlinforforge"
+loaderVersion="[5,)"
+license="LGPL-3.0-only (media code); CC BY-NC-SA 3.0 (models); bundled components retain their licenses"
+issueTrackerURL="https://github.com/reamnet/EAMedia/issues"
+
+[[mods]]
+modId="eamedia"
+version="${version}"
+displayName="Electrical Age Media"
+authors="Electrical Age contributors and reamnet"
+description='''Optional powered TV and web jukebox addon for Electrical Age.'''
+
+[[dependencies.eamedia]]
+modId="eln"
+type="required"
+versionRange="[3.0.60,3.1)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.eamedia]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.eamedia]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.249,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.eamedia]]
+modId="kotlinforforge"
+type="required"
+versionRange="[5.12.0,)"
+ordering="BEFORE"
+side="BOTH"
+
+[[dependencies.eamedia]]
+modId="mcef"
+type="required"
+versionRange="[2.1.6-1.21.1]"
+ordering="AFTER"
+side="CLIENT"
+
+[[mixins]]
+config="eamedia.mixins.json"
