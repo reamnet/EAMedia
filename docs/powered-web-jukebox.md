@@ -1,4 +1,4 @@
-# Powered Web Jukebox (EA Media 1.0.0)
+# Powered Web Jukebox (EA Media 1.0.1)
 
 The jukebox uses 120 V by default, with 240 V selectable in its GUI. Connect a matching appliance
 cord or a placed cable to its blue input. Playback enabled draws 25 W; standby draws 2 W.

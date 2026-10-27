@@ -14,6 +14,8 @@ locally, with hash verification; no first-launch browser/tool download is needed
 
 The devices keep their original `eln:*` IDs, recipes, model appearance and saved settings.
 Both cabinets and inventory previews are baked; the TV's live video texture remains dynamic.
+Use **1.0.1 or newer**: it fixes invisible cabinets by loading the addon's models independently
+of the core model registry. Existing blocks do not need replacement.
 
 Imported ELN code is LGPL-3.0-only, and imported models follow the original CC BY-NC-SA 3.0
 asset license. See [LICENSE.md](LICENSE.md). Bundled third-party components retain their own

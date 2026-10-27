@@ -1,0 +1,49 @@
+{
+  "passed": [
+    "Packaged addon owns both cabinet models independently of the core model registry",
+    "placed: both placed cabinets contain substantial baked geometry",
+    "previews: both baked item previews contain geometry in five display contexts",
+    "afterReload: both placed cabinets contain substantial baked geometry",
+    "previewsAfterReload: both baked item previews contain geometry in five display contexts"
+  ],
+  "measurements": {
+    "placed": {
+      "JUKEBOX": 1512,
+      "TV": 168
+    },
+    "previews": {
+      "JUKEBOX/GUI": 384,
+      "JUKEBOX/GROUND": 384,
+      "JUKEBOX/FIXED": 384,
+      "JUKEBOX/FIRST_PERSON_RIGHT_HAND": 384,
+      "JUKEBOX/THIRD_PERSON_RIGHT_HAND": 384,
+      "TV/GUI": 48,
+      "TV/GROUND": 48,
+      "TV/FIXED": 48,
+      "TV/FIRST_PERSON_RIGHT_HAND": 48,
+      "TV/THIRD_PERSON_RIGHT_HAND": 48
+    },
+    "view": {
+      "player": "(258.5, 80.0, 263.5)",
+      "camera": "(258.5, 81.61999988555908, 263.5)",
+      "yaw": 180.0,
+      "pitch": 6.0
+    },
+    "afterReload": {
+      "JUKEBOX": 1512,
+      "TV": 168
+    },
+    "previewsAfterReload": {
+      "JUKEBOX/GUI": 384,
+      "JUKEBOX/GROUND": 384,
+      "JUKEBOX/FIXED": 384,
+      "JUKEBOX/FIRST_PERSON_RIGHT_HAND": 384,
+      "JUKEBOX/THIRD_PERSON_RIGHT_HAND": 384,
+      "TV/GUI": 48,
+      "TV/GROUND": 48,
+      "TV/FIXED": 48,
+      "TV/FIRST_PERSON_RIGHT_HAND": 48,
+      "TV/THIRD_PERSON_RIGHT_HAND": 48
+    }
+  }
+}

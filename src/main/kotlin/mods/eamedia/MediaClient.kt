@@ -13,7 +13,14 @@ import net.minecraft.world.item.ItemStack
 import java.io.DataInputStream
 
 class MediaDescriptor(val kind: MediaKind): TransparentNodeDescriptor(kind.title,MediaElement::class.java,MediaRender::class.java) {
-    private val model by lazy { Eln.obj.getObj(kind.model) }
+    // ELN's model folder only scans the core mod file, not addon jars. Own this
+    // model here so both terrain bodies and item previews receive real geometry.
+    internal val model by lazy {
+        Obj3D().also {
+            check(it.loadFile("${kind.model}/${kind.model}.obj")) { "Could not load EA Media model ${kind.model}" }
+            check(it.getPart("Case")!=null && it.getPart("Base")!=null) { "Incomplete EA Media model ${kind.model}" }
+        }
+    }
     init { creativeTab=Eln.creativeTabMachines }
     override fun mustHaveFloor()=false
     fun draw(front: Direction,on: Boolean)=preserveMatrix {
