@@ -1,0 +1,61 @@
+{
+  "tests": 28,
+  "suites": 7,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "command": "./gradlew --no-daemon --max-workers=2 build generateLangFiles",
+  "coreBuildReference": "3.0.60",
+  "nativeCore": "3.0.63",
+  "suiteResults": [
+    {
+      "name": "mods.eamedia.AddonMigrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.BundledChromiumTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.BundledMediaRuntimeTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.MediaModelsTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.SharedTelevisionTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.TelevisionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "mods.eamedia.WebJukeboxTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

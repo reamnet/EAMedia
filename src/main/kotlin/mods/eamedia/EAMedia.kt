@@ -14,8 +14,17 @@ class EAMedia(bus: IEventBus) {
     init {
         bus.addListener<RegisterPayloadHandlersEvent> { event->
             // Required channel negotiation prevents mixing active media devices with a client
-            // that only has ELN's inert placeholders. No playback traffic uses this channel.
-            event.registrar("1").playToClient(MediaPresence.TYPE,MediaPresence.CODEC) { _,_-> }
+            // that only has ELN's inert placeholders or the old client-local TV protocol.
+            val registrar=event.registrar("2")
+            registrar.playToClient(MediaPresence.TYPE,MediaPresence.CODEC) { _,_-> }
+            registrar.playToServer(TelevisionCommand.TYPE,TelevisionCommand.CODEC) { packet,context->
+                context.enqueueWork { (context.player() as? net.minecraft.server.level.ServerPlayer)?.let { TelevisionNetwork.handle(it,packet) } }
+            }
+            registrar.playBidirectional(TelevisionStream.TYPE,TelevisionStream.CODEC) { packet,context->
+                if(context.flow().isClientbound)context.enqueueWork { TelevisionMirrorClient.receive(packet) }
+                else context.enqueueWork { (context.player() as? net.minecraft.server.level.ServerPlayer)?.let { TelevisionNetwork.stream(it,packet) } }
+            }
+            registrar.playToClient(TelevisionHostInput.TYPE,TelevisionHostInput.CODEC) { packet,context->context.enqueueWork { TelevisionMirrorClient.input(packet) } }
         }
         Eln.LOGGER.info("Electrical Age Media loaded; TV/jukebox backends remain client-only")
     }

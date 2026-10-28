@@ -1,0 +1,505 @@
+{
+  "status": "passed",
+  "clients": 2,
+  "dedicatedServer": true,
+  "core": "3.0.63",
+  "addon": "1.0.3",
+  "environment": "Linux software OpenGL, Sodium 0.8.13, Iris 1.8.14 beta, BSL 10.1.8, DH 3.3.3; OpenAL No Output device",
+  "checks": {
+    "A-join": {
+      "role": "A",
+      "id": "join",
+      "action": "join",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "integrated": false
+      }
+    },
+    "B-join": {
+      "role": "B",
+      "id": "join",
+      "action": "join",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "integrated": false
+      }
+    },
+    "A-host-video-retry": {
+      "role": "A",
+      "id": "host-video-retry",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": true,
+        "browser": true,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 20,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": -1038247428
+      }
+    },
+    "A-host-page": {
+      "role": "A",
+      "id": "host-page",
+      "action": "page",
+      "status": "passed",
+      "observation": {
+        "time": 0.829333,
+        "paused": false,
+        "width": 320,
+        "audioTracks": 1,
+        "muted": false,
+        "volume": 0.5681176947438429,
+        "contextState": "running",
+        "rms": 0.049816547777784305,
+        "clicks": 0,
+        "input": "",
+        "marker": "9sjgc6lozq6"
+      }
+    },
+    "B-mirrored-video-audio": {
+      "role": "B",
+      "id": "mirrored-video-audio",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 6,
+        "receivedAudioBytes": 303104,
+        "imageHash": -393713877
+      }
+    },
+    "B-viewer-open": {
+      "role": "B",
+      "id": "viewer-open",
+      "action": "open",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 7,
+        "receivedAudioBytes": 376832,
+        "imageHash": -1740093389
+      }
+    },
+    "A-remote-dom": {
+      "role": "A",
+      "id": "remote-dom",
+      "action": "page",
+      "status": "passed",
+      "observation": {
+        "time": 10.178667,
+        "paused": false,
+        "width": 320,
+        "audioTracks": 1,
+        "muted": false,
+        "volume": 0.5681176947438429,
+        "contextState": "running",
+        "rms": 0.05030884318037109,
+        "clicks": 1,
+        "input": "shared-browser",
+        "marker": "9sjgc6lozq6"
+      }
+    },
+    "A-remote-pause-seek": {
+      "role": "A",
+      "id": "remote-pause-seek",
+      "action": "page",
+      "status": "passed",
+      "observation": {
+        "time": 6.922667,
+        "paused": true,
+        "width": 320,
+        "audioTracks": 1,
+        "muted": false,
+        "volume": 0.5681176947438429,
+        "contextState": "running",
+        "rms": 0,
+        "clicks": 1,
+        "input": "shared-browser",
+        "marker": "9sjgc6lozq6"
+      }
+    },
+    "server-stable-reference": {
+      "role": "server",
+      "id": "stable-reference",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99768101455888,
+        "revision": 2,
+        "host": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "b0bb5c31-a26f-4f0b-8403-4824173f31d5",
+        "position": 6.922667,
+        "paused": true,
+        "imageHash": -960438488,
+        "imageBytes": 40637,
+        "poles": {
+          "pole0": {
+            "primary": [
+              12469.999996319022
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "installed": true,
+            "lampWatts": 0.0,
+            "light": 0
+          },
+          "pole1": {
+            "primary": [
+              12470.0
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              240.0
+            ],
+            "installed": true,
+            "lampWatts": 70.0,
+            "light": 15
+          },
+          "pole2": {
+            "primary": [
+              12469.999937748273
+            ],
+            "secondary": [
+              119.9976654648541,
+              119.9976654648781,
+              239.99527259757187
+            ],
+            "installed": true,
+            "lampWatts": 69.99724237574303,
+            "light": 14
+          }
+        }
+      }
+    },
+    "B-same-paused-picture-stable": {
+      "role": "B",
+      "id": "same-paused-picture-stable",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 16,
+        "receivedAudioBytes": 933888,
+        "imageHash": -960438488
+      }
+    },
+    "B-disconnect-host": {
+      "role": "B",
+      "id": "disconnect-host",
+      "action": "teleport",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 16,
+        "receivedAudioBytes": 933888,
+        "imageHash": -960438488
+      }
+    },
+    "B-host-handoff": {
+      "role": "B",
+      "id": "host-handoff",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": true,
+        "browser": true,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 5,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": 962496744
+      }
+    },
+    "B-resumed-pause": {
+      "role": "B",
+      "id": "resumed-pause",
+      "action": "page",
+      "status": "passed",
+      "observation": {
+        "time": 6.922667,
+        "paused": true,
+        "width": 320,
+        "audioTracks": 1,
+        "muted": false,
+        "volume": 0.5645666778179469,
+        "rms": 0,
+        "clicks": 0,
+        "input": "",
+        "marker": "pkl04hd2cqh"
+      }
+    },
+    "server-power-lost": {
+      "role": "server",
+      "id": "power-lost",
+      "action": "power",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": false,
+        "watts": 0.0,
+        "revision": 2,
+        "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "68c6c61e-51a3-45a7-ba36-668a5f6ca091",
+        "position": 6.922667,
+        "paused": true,
+        "imageHash": 1,
+        "imageBytes": 0,
+        "poles": {
+          "pole0": {
+            "primary": [
+              12469.999996321943
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "installed": true,
+            "lampWatts": 0.0,
+            "light": 0
+          },
+          "pole1": {
+            "primary": [
+              12470.0
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              240.0
+            ],
+            "installed": true,
+            "lampWatts": 70.0,
+            "light": 15
+          },
+          "pole2": {
+            "primary": [
+              12469.999937845654
+            ],
+            "secondary": [
+              119.99766546579119,
+              119.99766546581519,
+              239.99527259944605
+            ],
+            "installed": true,
+            "lampWatts": 69.99724237683628,
+            "light": 14
+          }
+        }
+      }
+    },
+    "B-power-loss-client": {
+      "role": "B",
+      "id": "power-loss-client",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": false,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 7,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": -1044502510
+      }
+    },
+    "server-power-returned": {
+      "role": "server",
+      "id": "power-returned",
+      "action": "power",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99768262933335,
+        "revision": 2,
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "68c6c61e-51a3-45a7-ba36-668a5f6ca091",
+        "position": 6.922667,
+        "paused": true,
+        "imageHash": 1,
+        "imageBytes": 0,
+        "poles": {
+          "pole0": {
+            "primary": [
+              12469.999996321943
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "installed": true,
+            "lampWatts": 0.0,
+            "light": 0
+          },
+          "pole1": {
+            "primary": [
+              12470.0
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              240.0
+            ],
+            "installed": true,
+            "lampWatts": 70.0,
+            "light": 15
+          },
+          "pole2": {
+            "primary": [
+              12469.999937851606
+            ],
+            "secondary": [
+              119.99766546584846,
+              119.99766546587246,
+              239.9952725995606
+            ],
+            "installed": true,
+            "lampWatts": 69.99724237690309,
+            "light": 14
+          }
+        }
+      }
+    },
+    "B-power-return-client": {
+      "role": "B",
+      "id": "power-return-client",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": true,
+        "browser": true,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 7,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": -1044502510
+      }
+    },
+    "B-power-return-page": {
+      "role": "B",
+      "id": "power-return-page",
+      "action": "page",
+      "status": "passed",
+      "observation": {
+        "time": 6.922667,
+        "paused": true,
+        "width": 320,
+        "audioTracks": 1,
+        "muted": false,
+        "volume": 0.5645666778179469,
+        "rms": 0,
+        "clicks": 0,
+        "input": "",
+        "marker": "eyqvqhv304f"
+      }
+    },
+    "server-final": {
+      "role": "server",
+      "id": "final",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99768262933335,
+        "revision": 2,
+        "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "10572180-4cd0-4065-bc78-b9bfe62907f3",
+        "position": 6.922667,
+        "paused": true,
+        "imageHash": 962496744,
+        "imageBytes": 30185,
+        "poles": {
+          "pole0": {
+            "primary": [
+              12469.999996324861
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "installed": true,
+            "lampWatts": 0.0,
+            "light": 0
+          },
+          "pole1": {
+            "primary": [
+              12470.0
+            ],
+            "secondary": [
+              0.0,
+              0.0,
+              240.0
+            ],
+            "installed": true,
+            "lampWatts": 70.0,
+            "light": 15
+          },
+          "pole2": {
+            "primary": [
+              12469.999937883736
+            ],
+            "secondary": [
+              119.99766546615764,
+              119.99766546618164,
+              239.995272600179
+            ],
+            "installed": true,
+            "lampWatts": 69.99724237726382,
+            "light": 14
+          }
+        }
+      }
+    }
+  }
+}

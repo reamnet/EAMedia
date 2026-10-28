@@ -49,6 +49,9 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
     var settings=kind.defaults;var enabled=true;var trip=false;var working=false
     val stats=DoubleArray(2)
     var mediaUrl="";var mediaRequested=false;var mediaRevision=0
+    var tvSession: java.util.UUID?=null;var tvController: java.util.UUID?=null;var tvInteractive=false
+    var tvHost: java.util.UUID?=null;var tvHostEpoch=java.util.UUID(0,0)
+    var tvPlayback=TelevisionPlayback();var tvSampleNanos=0L;var tvBack=false;var tvForward=false
     val webAudio by lazy { WebJukeboxAudio(this,tileEntity) }
     val television by lazy { TelevisionBrowser(this) }
     override fun refresh(deltaT: Float) { super.refresh(deltaT);if(kind==MediaKind.TV)television.update() else webAudio.update() }
@@ -60,6 +63,12 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
     override fun networkUnserialize(input: DataInputStream) {
         super.networkUnserialize(input);settings.indices.forEach { settings[it]=input.readDouble() };enabled=input.readBoolean();trip=input.readBoolean();working=input.readBoolean()
         stats.indices.forEach { stats[it]=input.readDouble() };mediaUrl=input.readUTF();mediaRequested=input.readBoolean();mediaRevision=input.readInt()
+        if(kind==MediaKind.TV) {
+            tvSession=java.util.UUID.fromString(input.readUTF());tvController=input.readUTF().takeIf { it.isNotBlank() }?.let(java.util.UUID::fromString);tvInteractive=input.readBoolean()
+            tvHost=input.readUTF().takeIf { it.isNotBlank() }?.let(java.util.UUID::fromString);tvHostEpoch=java.util.UUID.fromString(input.readUTF())
+            tvPlayback=TelevisionPlayback(input.readDouble(),input.readBoolean(),input.readDouble(),input.readDouble(),input.readBoolean(),input.readBoolean());tvSampleNanos=System.nanoTime()
+            tvBack=input.readBoolean();tvForward=input.readBoolean()
+        }
     }
     override fun newGuiDraw(side: Direction,player: Player)=if(kind==MediaKind.TV)TelevisionScreen(this) else JukeboxScreen(this)
 }

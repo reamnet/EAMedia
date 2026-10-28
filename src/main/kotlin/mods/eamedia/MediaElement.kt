@@ -29,6 +29,10 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     var mediaRequested=false;private set
     var mediaRevision=0;private set
     var lifetimeJoules=0.0;private set
+    val sharedTv=SharedTelevision()
+    val mirrorRelay=TelevisionRelay()
+    private val history=ArrayList<String>()
+    private var historyIndex=-1
     private var legacy=CompoundTag()
     val input=NbtElectricalLoad("industrialInput").apply { serialResistance=.0001 }
     val resistor=Resistor(input,null).apply { resistance=1e19 }
@@ -56,6 +60,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         var demand=if(working)kind.watts else if(enabled)2.0 else 0.0
         working=working && abs(input.voltage)>=nominal*.8
         if(!input.voltage.isFinite() || abs(input.voltage)>nominal*1.3) { working=false;demand=0.0 }
+        if(kind==MediaKind.TV) { sharedTv.running(working);if(!working || sharedTv.activeViewers.isEmpty())mirrorRelay.drop() }
         resistor.resistance=IndustrialEnergy.resistance(nominal,demand)
         tripSource.state(trip)
     }
@@ -66,9 +71,22 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     }
     fun setEnabled(value: Boolean) { enabled=value;prepare();needPublish() }
     override fun setRemoteEnabled(enabled: Boolean)=setEnabled(enabled)
-    fun playMedia(value: String): Boolean {
+    fun playMedia(value: String)=playMedia(value,true)
+    private fun playMedia(value: String,remember: Boolean): Boolean {
         val url=kind.address(value) ?: return false
-        mediaUrl=url.toASCIIString();mediaRequested=true;mediaRevision++;prepare();needPublish();return true
+        mediaUrl=url.toASCIIString();mediaRequested=true;mediaRevision++
+        if(kind==MediaKind.TV) {
+            sharedTv.navigate()
+            if(remember && history.getOrNull(historyIndex)!=mediaUrl) {
+                while(history.size>historyIndex+1)history.removeAt(history.lastIndex)
+                history.add(mediaUrl);if(history.size>32)history.removeAt(0);historyIndex=history.lastIndex
+            }
+        }
+        prepare();needPublish();return true
+    }
+    internal fun navigateHistory(action: Int) {
+        val next=when(action) { TelevisionCommand.BACK->historyIndex-1;TelevisionCommand.FORWARD->historyIndex+1;else->historyIndex }
+        if(next in history.indices) { historyIndex=next;playMedia(history[next],false) }
     }
     fun stopMedia() { mediaRequested=false;prepare();needPublish() }
     override fun getElectricalLoad(side: Direction,lrdu: LRDU)=when {
@@ -88,6 +106,10 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         settings.forEachIndexed { i,v->tag.putDouble("industrialSetting$i",v) }
         tag.putBoolean("industrialEnabled",enabled);tag.putBoolean("industrialTrip",trip);tag.putDouble("industrialLifetime",lifetimeJoules)
         tag.putString("mediaUrl",mediaUrl);tag.putBoolean("mediaRequested",mediaRequested);tag.putInt("mediaRevision",mediaRevision);cord.write(tag)
+        if(kind==MediaKind.TV) {
+            sharedTv.write(tag);val urls=net.minecraft.nbt.ListTag();history.forEach { urls.add(net.minecraft.nbt.StringTag.valueOf(it)) }
+            tag.put("televisionHistory",urls);tag.putInt("televisionHistoryIndex",historyIndex)
+        }
     }
     private fun load(tag: CompoundTag) {
         legacy=tag.copy()
@@ -96,6 +118,12 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         enabled=!tag.contains("industrialEnabled") || tag.getBoolean("industrialEnabled");trip=tag.getBoolean("industrialTrip")
         lifetimeJoules=tag.getDouble("industrialLifetime").takeIf { it.isFinite() && it>=0 } ?: 0.0
         mediaUrl=tag.getString("mediaUrl").takeIf { kind.address(it)!=null } ?: "";mediaRequested=tag.getBoolean("mediaRequested");mediaRevision=tag.getInt("mediaRevision")
+        if(kind==MediaKind.TV) {
+            sharedTv.read(tag);history.clear()
+            val urls=tag.getList("televisionHistory",8);for(i in 0 until minOf(32,urls.size))TelevisionUrl.parse(urls.getString(i))?.toASCIIString()?.let(history::add)
+            historyIndex=tag.getInt("televisionHistoryIndex").coerceIn(-1,history.lastIndex)
+            if(history.isEmpty() && mediaUrl.isNotEmpty()) { history.add(mediaUrl);historyIndex=0 }
+        }
         cord.read(tag);prepare()
     }
     override fun readFromNBT(tag: CompoundTag) { super.readFromNBT(tag);load(tag) }
@@ -105,6 +133,12 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     override fun networkSerialize(out: DataOutputStream) {
         super.networkSerialize(out);settings.forEach(out::writeDouble);out.writeBoolean(enabled);out.writeBoolean(trip);out.writeBoolean(working)
         out.writeDouble(input.voltage);out.writeDouble(resistor.power);out.writeUTF(mediaUrl);out.writeBoolean(mediaRequested);out.writeInt(mediaRevision)
+        if(kind==MediaKind.TV) {
+            out.writeUTF(sharedTv.session.toString());out.writeUTF(sharedTv.controller?.toString() ?: "");out.writeBoolean(sharedTv.interactive)
+            out.writeUTF(sharedTv.host?.toString() ?: "");out.writeUTF(sharedTv.hostEpoch.toString())
+            val s=sharedTv.snapshot();out.writeDouble(s.position);out.writeBoolean(s.paused);out.writeDouble(s.rate);out.writeDouble(s.duration);out.writeBoolean(s.live);out.writeBoolean(s.known)
+            out.writeBoolean(historyIndex>0);out.writeBoolean(historyIndex>=0 && historyIndex<history.lastIndex)
+        }
     }
     override fun networkUnserialize(input: DataInputStream): Byte {
         val id=super.networkUnserialize(input)
@@ -112,7 +146,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
             80->applySettings(doubleArrayOf(input.readDouble(),input.readDouble()))
             81->setEnabled(input.readBoolean())
             82->{ trip=false;prepare();needPublish() }
-            86->playMedia(input.readUTF())
+            86->{ val url=input.readUTF();if(kind!=MediaKind.TV)playMedia(url) }
             87->stopMedia()
         }
         return id

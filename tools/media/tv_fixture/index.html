@@ -12,10 +12,14 @@ pre{position:absolute;top:360px;left:20px;white-space:pre-wrap;font-size:13px;wi
 <video id="video" src="test.webm" autoplay loop controls playsinline></video>
 <h2>Electrical Age<br>Powered Browser TV<br><small>Video + audio test</small></h2>
 <input id="input" aria-label="Keyboard test"><button id="button">Click test</button>
+<button id="pause" style="left:480px">Pause/play</button><button id="seek" style="left:620px">Seek to 5s</button>
 <pre id="state"></pre>
 <script>
 const video=document.querySelector('#video'),input=document.querySelector('#input');
 let clicks=0,analyser,context;document.querySelector('#button').onclick=()=>clicks++;
+const marker=Math.random().toString(36).slice(2);
+document.querySelector('#pause').onclick=()=>video.paused?video.play():video.pause();
+document.querySelector('#seek').onclick=()=>video.currentTime=5;
 video.onplaying=()=>{
  if(analyser)return;
  context=new AudioContext();analyser=context.createAnalyser();analyser.fftSize=512;
@@ -24,7 +28,7 @@ video.onplaying=()=>{
 };
 setInterval(()=>{
  let rms=0;if(analyser){const b=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(b);rms=Math.sqrt(b.reduce((s,x)=>s+x*x,0)/b.length)}
- const data={time:video.currentTime,paused:video.paused,width:video.videoWidth,audioTracks:video.captureStream().getAudioTracks().length,muted:video.muted,volume:video.volume,contextState:context?.state,rms,clicks,input:input.value};
+ const data={time:video.currentTime,paused:video.paused,width:video.videoWidth,audioTracks:video.captureStream().getAudioTracks().length,muted:video.muted,volume:video.volume,contextState:context?.state,rms,clicks,input:input.value,marker};
  document.querySelector('#state').textContent='ELN_TV_STATE:'+JSON.stringify(data)+':END';
 },100);
 </script>

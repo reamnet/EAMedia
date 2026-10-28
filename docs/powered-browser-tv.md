@@ -14,17 +14,13 @@ An insufficient or lost supply stops the browser; restoring power reloads the se
 Right-click the TV to open its browser controls. Paste a complete `https://` or `http://` address
 and press **Go** or Enter. Click the picture to interact with the webpage. Mouse clicks, dragging,
 scrolling, keyboard input and browser text shortcuts are forwarded to Chromium. **Ctrl+L** selects
-the address bar. Back, forward and reload act on your local browser.
+the address bar. Back, forward and reload navigate the shared TV.
 
 **TV off** stops playback. **TV on** opens the address in the bar. The voltage button selects
 120/240 V when no cord is attached. Minus/plus adjust the TV's volume. Escape closes the controls;
 the same browser continues playing on the placed TV.
 
-Go shares the chosen address with nearby viewers. **Share page** shares your browser's current
-address after following links. Each client renders its own browser, including cookies and website
-controls; typing, account state, playback position and arbitrary webpage actions are not mirrored
-to other players. Videos are not frame-synchronized between clients. The server stores the chosen
-address and power settings, without downloading webpages or transmitting browser cookies.
+The TV uses one shared browser screen. See **Shared screen (1.0.3)** below for control, hosting and network details.
 
 ## Browser installation and sound
 
@@ -44,7 +40,7 @@ FFmpeg, yt-dlp and QuickJS are bundled separately for jukebox playback. Source U
 revision, hashes and original runtime licenses are recorded in `assets/eamedia/chromium/`.
 The refresh script is `tools/media/bundle_chromium.py`; ordinary builds use committed resources.
 
-Audio uses Chromium's normal stereo output device. ELN applies TV volume, distance attenuation,
+The hosting client uses Chromium's normal stereo output device; other viewers play the captured PCM stream through Minecraft. ELN applies TV volume, distance attenuation,
 and Minecraft's Master and Records sliders inside each webpage to HTML5 media and newly connected
 Web Audio output. The webpage's own mute button remains independent. Audio is stereo rather than
 a directional OpenAL sound. Unusual pages that replace browser APIs or create audio before the
@@ -58,7 +54,7 @@ windows are not opened; ordinary HTTP(S) popup links open in the TV's current pa
 ## Performance and checks
 
 The browser viewport is 960×540, with screen texture uploads capped at 24 per second. At most two
-TV browsers run per client. Moving beyond 32 blocks, losing power or unloading/breaking the TV
+TVs are active per client; only the elected host opens Chromium for each TV. Moving beyond 32 blocks, losing power or unloading/breaking the TV
 closes its browser and releases its texture and audio resources. Watching streaming video still
 has CPU/GPU costs; a live video screen cannot be baked into static terrain.
 
@@ -88,3 +84,29 @@ ELN 3.0.60 accepts the addon's standalone screen controls without requiring an i
 Earlier core versions rejected Go/settings packets for the TV's plain screen, leaving both its
 picture and in-world screen black. Controls still require the player to be in the same dimension
 and within eight blocks. This addon requires ELN 3.0.60 or newer in the 3.0 series.
+
+## Shared screen (1.0.3)
+
+Each powered TV now elects one nearby client to run its browser. That client sends the rendered
+picture and captured audio through the server to the other viewers. Viewers do not open private
+copies of the page: links, forms, videos, pause/seek actions and browser navigation use the same
+browser instance. The placed screen and browser controls show that shared picture.
+
+Right-click to request control. Only one player controls a TV at a time; close its controls to
+release control. **Take control** retries after the other player finishes. The browser host can
+remain a spectator while another player controls it. Back/forward use the TV's shared URL history;
+Go/reload navigate for everyone. Clipboard paste sends the controlling player's text.
+
+Mirrored pictures use bounded JPEG frames, up to 960×540 at 12 frames/second, with stereo 24 kHz
+PCM audio and bounded buffers. Compression and network delay mean this is not a lossless,
+frame-perfect video feed. The server relays data without running Chromium or decoding images.
+Budget limits cap incoming video near 800 kB/s and audio near 120 kB/s per TV; outgoing bandwidth
+scales with viewers. Each client may watch two TVs within 32 blocks. Power loss closes the browser
+and clears its stream. A late viewer receives the current picture.
+
+The browser runs with the elected host's website session. Other viewers can see that page and,
+when given control, interact with it. Cookies are not copied between players. When the host leaves,
+another viewer opens the shared URL and attempts to resume ordinary media at the saved position;
+arbitrary form state, logins and browser memory do not migrate. Reloading or losing power has the
+same page-state limitation. Protected media and websites that prevent audio capture may have a
+visible picture without mirrored audio. Streaming support still depends on Chromium and the site.

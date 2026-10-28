@@ -41,21 +41,24 @@ Powered_Web_Jukebox.name=Powered Web Jukebox
 # src/main/kotlin/mods/eamedia/TelevisionBrowser.kt
 Browser_could_not_start;_turn_the_TV_off_and_on_to_retry=Browser could not start; turn the TV off and on to retry
 Browser_engine_unavailable;_check_MCEF_setup=Browser engine unavailable; check MCEF setup
-Browser_ready;_click_the_picture_to_interact=Browser ready; click the picture to interact
 Enter_a_webpage_or_video_address_and_turn_on_the_TV=Enter a webpage or video address and turn on the TV
 Loading_webpage...=Loading webpage...
+Shared_TV;_take_control_to_interact=Shared TV; take control to interact
+Shared_TV;_you_control_the_browser=Shared TV; you control the browser
 Two_nearby_TVs_are_already_active=Two nearby TVs are already active
+Waiting_for_the_shared_TV_picture=Waiting for the shared TV picture
 Waiting_for_viewer_within_32_blocks=Waiting for viewer within 32 blocks
 
 # src/main/kotlin/mods/eamedia/TelevisionScreen.kt
 Go=Go
 Powered_Browser_Television=Powered Browser Television
 Reload=Reload
-Share_page=Share page
 TV_off=TV off
 TV_on=TV on
+Take_control=Take control
 Use_a_complete_HTTP_or_HTTPS_address=Use a complete HTTP or HTTPS address
 Web_address=Web address
+You_control_TV=You control TV
 
 # src/main/kotlin/mods/eamedia/WebJukeboxAudio.kt
 Audio_unavailable;_check_link,_HTTPS_access_and_media_tools=Audio unavailable; check link, HTTPS access and media tools

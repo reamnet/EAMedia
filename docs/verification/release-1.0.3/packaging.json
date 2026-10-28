@@ -1,0 +1,20 @@
+[
+  {
+    "jar": "EAMedia-1.0.3.jar",
+    "bytes": 764549987,
+    "version": "1.0.3",
+    "requiredCore": "3.0.60+",
+    "sharedBrowserProtocol": "2",
+    "nativeMediaFiles": 39,
+    "nativeChromiumParts": 12
+  },
+  {
+    "jar": "EAMedia-1.0.3-server.jar",
+    "bytes": 467611,
+    "version": "1.0.3",
+    "requiredCore": "3.0.60+",
+    "sharedBrowserProtocol": "2",
+    "nativeMediaFiles": 0,
+    "nativeChromiumParts": 0
+  }
+]
