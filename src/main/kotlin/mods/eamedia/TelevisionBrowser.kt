@@ -115,7 +115,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
             if(!preserve)closeBrowser()
             pendingPage=null;revision=render.mediaRevision;browserEpoch=render.tvHostEpoch;failed=false
         }
-        if(!MCEF.isInitialized() || failed)return
+        if(!MCEF.isInitialized() || failed || !mods.eamedia.web.BrowserWebProxy.client.enabled || !approvedPage())return
         if(browser==null) {
             if(!active.contains(this)){capacity=active.size>=MAX_BROWSERS;if(capacity)return;active.add(this)}
             val url=TelevisionUrl.parse(render.mediaUrl)?.toASCIIString() ?: return
@@ -198,9 +198,12 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         }
     }
 
+    private fun approvedPage()=TelevisionUrl.parse(render.mediaUrl)?.host?.let{mods.eamedia.web.BrowserWebProxy.client.domains.allows(it)} ?: false
     fun status(): String=when {
         !render.mediaRequested->tr("Enter a webpage or video address and turn on the TV")
         !render.working->tr("Waiting for electrical power")
+        !render.tvServerHosted && !mods.eamedia.web.BrowserWebProxy.client.enabled->if(mods.eamedia.web.BrowserWebProxy.client.connected)tr("The server has disabled TV web routing") else tr("Waiting for the server web route")
+        !render.tvServerHosted && !approvedPage()->tr("This website is not approved by the server")
         render.tvServerHosted && render.tvServerStatus=="RUNTIME_MISSING"->tr("Install the full EA Media jar on the server for TV playback")
         render.tvServerHosted && render.tvServerStatus=="DISPLAY_MISSING"->tr("The server needs Xvfb for its browser; see server setup")
         render.tvServerHosted && render.tvServerStatus=="FAILED"->tr("Server browser failed; check its worker log")

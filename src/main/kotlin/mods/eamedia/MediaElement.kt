@@ -61,7 +61,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         var demand=if(working)kind.watts else if(enabled)2.0 else 0.0
         working=working && abs(input.voltage)>=nominal*.8
         if(!input.voltage.isFinite() || abs(input.voltage)>nominal*1.3) { working=false;demand=0.0 }
-        if(kind==MediaKind.TV) { sharedTv.running(working);if(!working || sharedTv.activeViewers.isEmpty())mirrorRelay.drop() }
+        if(kind==MediaKind.TV) { if(!working)mods.eamedia.web.WebRoutingNetwork.revoke(sharedTv.session);sharedTv.running(working);if(!working || sharedTv.activeViewers.isEmpty())mirrorRelay.drop() }
         resistor.resistance=IndustrialEnergy.resistance(nominal,demand)
         tripSource.state(trip)
     }

@@ -4,7 +4,7 @@ Optional powered **browser TV** and **web jukebox** for [Electrical Age](https:/
 on Minecraft 1.21.1 / NeoForge. Install ELN 3.0.60+ and EA Media on both sides to enable them;
 leave EA Media out for a lightweight ELN installation without either device.
 
-EA Media 1.0.6 provides 960×540 TV pictures at up to 30 fps for the host and shared viewers. It defaults to client-hosted TVs with a shared picture, controls and Minecraft audio for every viewer. The Minecraft server relays the stream without running Chromium. Server-owned browser hosting remains an optional JVM setting; see the TV guide.
+EA Media 1.0.7 provides 960×540 TV pictures at up to 30 fps for the host and shared viewers. It defaults to client-hosted TVs with a shared picture, controls and Minecraft audio for every viewer. TV websites now load through the Minecraft server using its approved-domain list; the server also relays the shared stream without running Chromium. Server-owned browser hosting remains an optional JVM setting; see the TV guide.
 
 The client jar contains Chromium, MCEF, FFmpeg, yt-dlp and QuickJS. Matching tools extract
 locally, with hash verification; no first-launch browser/tool download is needed. A small

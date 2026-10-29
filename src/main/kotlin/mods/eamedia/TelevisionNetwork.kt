@@ -45,11 +45,11 @@ object TelevisionNetwork {
                     if(host==null || host.serverLevel()!==world || host.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)shared.leave(id)
                 }
                 val fresh=player.uuid !in shared.activeViewers
-                shared.claim(player.uuid,false);ServerTelevisions.observe(tv,world,p);tv.mirrorRelay.reset(shared.session,shared.hostEpoch,tv.mediaRevision);tv.needPublish()
+                shared.claim(player.uuid,false);mods.eamedia.web.WebRoutingNetwork.observe(player,tv);ServerTelevisions.observe(tv,world,p);tv.mirrorRelay.reset(shared.session,shared.hostEpoch,tv.mediaRevision);tv.needPublish()
                 if(fresh && shared.host!=player.uuid)tv.mirrorRelay.cached.forEach { PacketDistributor.sendToPlayer(player,it) }
             }
             TelevisionCommand.RELEASE->{ shared.release(player.uuid);tv.needPublish() }
-            TelevisionCommand.LEAVE->{ shared.leave(player.uuid);tv.needPublish() }
+            TelevisionCommand.LEAVE->{ val host=shared.host==player.uuid;shared.leave(player.uuid);if(host)mods.eamedia.web.WebRoutingNetwork.revoke(shared.session);tv.needPublish() }
             TelevisionCommand.NAVIGATE->if(packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null && shared.claim(player.uuid,true))tv.playMedia(packet.value)
             TelevisionCommand.BACK,TelevisionCommand.FORWARD,TelevisionCommand.RELOAD->if(shared.claim(player.uuid,true)) {
                 if(shared.serverHosted)tv.navigateHistory(packet.action)

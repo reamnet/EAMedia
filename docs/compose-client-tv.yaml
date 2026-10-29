@@ -1,6 +1,8 @@
 # Client-hosted TVs need no custom Docker image or Xvfb.
-# Put EAMedia-1.0.6-server.jar (or the full jar) in ./data/mods/.
-# Every client needs the full EAMedia-1.0.6.jar. Install one addon variant per side.
+# Website routing uses the existing game port; approve domains in
+# ./data/config/eamedia-web-domains.txt after first server start.
+# Put EAMedia-1.0.7-server.jar (or the full jar) in ./data/mods/.
+# Every client needs the full EAMedia-1.0.7.jar. Install one addon variant per side.
 services:
   minecraft:
     image: itzg/minecraft-server:java21
@@ -15,7 +17,7 @@ services:
       VERSION: "1.21.1"
       MEMORY: "18G"
       TZ: "America/New_York"
-      JVM_OPTS: "-Deamedia.tvHosting=client"
+      JVM_OPTS: "-Deamedia.tvHosting=client -Deamedia.webRouting=true"
     volumes:
       - ./data:/data
     mem_limit: 22g

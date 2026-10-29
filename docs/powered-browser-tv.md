@@ -1,16 +1,17 @@
 # Powered Browser Television
 
-EA Media 1.0.6 uses **client hosting by default**. One nearby player's client
+EA Media 1.0.7 uses **client hosting by default**. One nearby player's client
 runs the full interactive browser; everyone else receives its shared picture and
-audio. The server validates controls and relays bounded encoded packets. It does
-not launch Chromium, Xvfb or a video encoder in this mode. Every viewer sees the
+audio. The server validates controls, forwards approved website traffic and relays
+bounded picture/audio packets. It does not launch Chromium, Xvfb or a video
+encoder in this mode. Every viewer sees the
 same page, rather than opening an independent webpage.
 
 ## Install and hosting mode
 
-Update the server and every client to 1.0.6 together (required protocol 5).
-Use the full `EAMedia-1.0.6.jar` on clients. The Minecraft server can use the much
-smaller `EAMedia-1.0.6-server.jar` in the default client mode; install one variant.
+Update the server and every client to 1.0.7 together (required protocol 6).
+Use the full `EAMedia-1.0.7.jar` on clients. The Minecraft server can use the much
+smaller `EAMedia-1.0.7-server.jar` in the default client mode; install one variant.
 ELN 3.0.60+ remains supported and no core update is required.
 
 The first nearby observer hosts the TV. Taking control does not transfer hosting.
@@ -55,6 +56,70 @@ docker compose up -d --force-recreate minecraft
 The earlier custom image can also be retained; its browser libraries simply go
 unused in client mode. Existing browser cache directories can remain in `/data`.
 No extra ports, GPU, display service or host audio device are required.
+
+## Website traffic through the server
+
+The hosting client renders the browser, but HTTP/HTTPS website connections and
+DNS resolution now run through the Minecraft server. The website sees the
+server's outbound address (or its configured upstream proxy), rather than the
+hosting client's direct connection. Traffic travels over the existing game
+connection; there is no new public proxy port, container or client password.
+Your Compose port mapping stays `25565:25565`.
+
+Only a logged-in player currently hosting at least one loaded, powered TV
+receives routing permission. Viewer/control access alone is insufficient. Loss
+of the last hosted TV or player disconnect revokes it; stale permissions expire. HTTPS stays encrypted
+between Chromium and the website: the mod does not substitute certificates,
+terminate website TLS or move cookies/login state onto the server.
+
+The server owner approves destinations in:
+
+```text
+config/eamedia-web-domains.txt
+```
+
+With your Compose volume, that is `./data/config/eamedia-web-domains.txt` on the
+host. The file is created on first server start with YouTube-related domains.
+Each line permits a domain and its subdomains. Add other specific sites and
+restart the server; for example:
+
+```text
+# Keep the existing YouTube entries, then add approved websites:
+example.com
+video.example.net
+```
+
+Up to 32 domain entries are supported. Wildcards/unrestricted entries are not
+accepted. Page resources, embedded players, login providers and CDNs also need
+approval if they use other domains. The server logs newly blocked domains
+(without full URLs or cookies) to help the owner update the file. Private/local addresses and ports other
+than 80/443 are rejected even when a domain is listed. A blocked main page shows
+“This website is not approved by the server.” YouTube/other sites can still
+change their required endpoints, codecs, sign-in flows or DRM behavior.
+
+Routing fails closed: if the server route is unavailable or a destination is
+not approved, the browser does not switch to a direct client connection. QUIC
+and unproxied WebRTC UDP are disabled for the browser engine. To verify an exit
+address, the server owner can approve an IP-check website such as
+`api.ipify.org`, restart and open `https://api.ipify.org/` on the TV.
+
+The pinned MCEF bridge exposes engine-wide proxy settings, so other mods using
+that same Chromium engine share this routing policy and require an active TV
+host permission. Ordinary desktop browsers and Minecraft's other networking are
+unaffected. The jukebox's separate media-tool downloads remain client-side.
+
+The server uses bounded buffers, per-stream credits and connection limits.
+DNS/connect and socket forwarding run on I/O workers; payload handling uses the
+network thread, rather than the simulation thread. Forwarded web traffic still
+uses server bandwidth, Minecraft packet processing and the same TCP connection
+as gameplay. The hosting client still receives the source media and uploads the
+shared picture. This moves the website exit point; it does not eliminate client
+rendering/network costs or guarantee a performance gain.
+
+An administrator can disable this route with `-Deamedia.webRouting=false` and a
+restart. It disables client-hosted TV web access rather than enabling a direct
+fallback. A deliberately configured server `HTTPS_PROXY`/`HTTP_PROXY` upstream
+is honored; its own routing and DNS policy also applies.
 
 ## Controls and audio
 

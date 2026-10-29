@@ -48,8 +48,11 @@ Server_browser_failed;_check_its_worker_log=Server browser failed; check its wor
 Shared_TV;_take_control_to_interact=Shared TV; take control to interact
 Shared_TV;_you_control_the_browser=Shared TV; you control the browser
 The_server_browser_limit_has_been_reached=The server browser limit has been reached
+The_server_has_disabled_TV_web_routing=The server has disabled TV web routing
 The_server_needs_Xvfb_for_its_browser;_see_server_setup=The server needs Xvfb for its browser; see server setup
+This_website_is_not_approved_by_the_server=This website is not approved by the server
 Two_nearby_TVs_are_already_active=Two nearby TVs are already active
+Waiting_for_the_server_web_route=Waiting for the server web route
 Waiting_for_the_shared_TV_picture=Waiting for the shared TV picture
 Waiting_for_viewer_within_32_blocks=Waiting for viewer within 32 blocks
 

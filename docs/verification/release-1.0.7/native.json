@@ -1,0 +1,813 @@
+[
+  {
+    "role": "A",
+    "id": "approved-restores-browser",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": true,
+      "browser": true,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 5,
+      "controller": false,
+      "encodedFrames": 71,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 28800,
+      "imageHash": 727669705,
+      "playedAudioBytes": 28800,
+      "soundActive": true,
+      "playbackStarts": 2,
+      "serverStatus": "OFF",
+      "channelResumes": 1,
+      "webEnabled": true,
+      "webOpened": 195,
+      "webDownloaded": 1264258,
+      "webUploaded": 89767
+    }
+  },
+  {
+    "role": "A",
+    "id": "boot",
+    "action": "boot",
+    "status": "passed",
+    "observation": {}
+  },
+  {
+    "role": "A",
+    "id": "close-controls",
+    "action": "close",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": true,
+      "browser": true,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 7,
+      "controller": false,
+      "encodedFrames": 6,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 115200,
+      "imageHash": 197196239,
+      "playedAudioBytes": 115200,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 9,
+      "webEnabled": true,
+      "webOpened": 42,
+      "webDownloaded": 1246950,
+      "webUploaded": 19121
+    }
+  },
+  {
+    "role": "A",
+    "id": "go",
+    "action": "go",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": 0,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 0,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "A",
+    "id": "host-departs",
+    "action": "quit",
+    "status": "passed",
+    "observation": {}
+  },
+  {
+    "role": "A",
+    "id": "join",
+    "action": "join",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "integrated": false
+    }
+  },
+  {
+    "role": "A",
+    "id": "open",
+    "action": "open",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": false,
+      "browser": false,
+      "working": false,
+      "url": "",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": 0,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 0,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "A",
+    "id": "routed-browser-audio",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": true,
+      "browser": true,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 6,
+      "controller": true,
+      "encodedFrames": 5,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 67200,
+      "imageHash": 1552402617,
+      "playedAudioBytes": 67200,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 4,
+      "webEnabled": true,
+      "webOpened": 35,
+      "webDownloaded": 1246229,
+      "webUploaded": 15901
+    }
+  },
+  {
+    "role": "A",
+    "id": "unapproved-stops-browser",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": true,
+      "browser": false,
+      "working": true,
+      "url": "http://unapproved.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": false,
+      "encodedFrames": 66,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": 782492362,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 179,
+      "webDownloaded": 1260958,
+      "webUploaded": 81840
+    }
+  },
+  {
+    "role": "A",
+    "id": "volume",
+    "action": "sound-volume",
+    "status": "passed",
+    "observation": {
+      "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "host": false,
+      "browser": false,
+      "working": false,
+      "url": "",
+      "paintedFrames": 0,
+      "controller": false,
+      "encodedFrames": 0,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": 0,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 0,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "approved-restores-mirror",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 5,
+      "receivedAudioBytes": 67200,
+      "imageHash": 727669705,
+      "playedAudioBytes": 67200,
+      "soundActive": true,
+      "playbackStarts": 2,
+      "serverStatus": "OFF",
+      "channelResumes": 4,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "boot",
+    "action": "boot",
+    "status": "passed",
+    "observation": {}
+  },
+  {
+    "role": "B",
+    "id": "handoff-routes-through-server",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": true,
+      "browser": true,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 10,
+      "controller": true,
+      "encodedFrames": 9,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 67200,
+      "imageHash": -1712592337,
+      "playedAudioBytes": 67200,
+      "soundActive": true,
+      "playbackStarts": 3,
+      "serverStatus": "OFF",
+      "channelResumes": 3,
+      "webEnabled": true,
+      "webOpened": 22,
+      "webDownloaded": 1244890,
+      "webUploaded": 10185
+    }
+  },
+  {
+    "role": "B",
+    "id": "input-click",
+    "action": "click",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 20,
+      "receivedAudioBytes": 595200,
+      "imageHash": -366202577,
+      "playedAudioBytes": 403200,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 25,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "input-focus",
+    "action": "click",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 15,
+      "receivedAudioBytes": 499200,
+      "imageHash": -1534479382,
+      "playedAudioBytes": 307200,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 18,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "input-text",
+    "action": "type",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 17,
+      "receivedAudioBytes": 537600,
+      "imageHash": -366086875,
+      "playedAudioBytes": 345600,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 21,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "join",
+    "action": "join",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "integrated": false
+    }
+  },
+  {
+    "role": "B",
+    "id": "power-off-clears-browser",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": false,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 16,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": -2142766171,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 3,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 27,
+      "webDownloaded": 1245405,
+      "webUploaded": 12538
+    }
+  },
+  {
+    "role": "B",
+    "id": "power-on-restores-route",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": true,
+      "browser": true,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 5,
+      "controller": true,
+      "encodedFrames": 21,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 19200,
+      "imageHash": 301093811,
+      "playedAudioBytes": 19200,
+      "soundActive": true,
+      "playbackStarts": 4,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 33,
+      "webDownloaded": 1246023,
+      "webUploaded": 15354
+    }
+  },
+  {
+    "role": "B",
+    "id": "restore-approved-domain",
+    "action": "go",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 0,
+      "receivedAudioBytes": 0,
+      "imageHash": -761553804,
+      "playedAudioBytes": 0,
+      "soundActive": false,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 0,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "shared-picture-audio",
+    "action": "watch",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": false,
+      "encodedFrames": 0,
+      "receivedFrames": 5,
+      "receivedAudioBytes": 297600,
+      "imageHash": 2142366463,
+      "playedAudioBytes": 124800,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 7,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "take-control",
+    "action": "open",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 12,
+      "receivedAudioBytes": 441600,
+      "imageHash": 210630522,
+      "playedAudioBytes": 268800,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 14,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "unapproved-domain",
+    "action": "go",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://unapproved.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": true,
+      "encodedFrames": 0,
+      "receivedFrames": 21,
+      "receivedAudioBytes": 633600,
+      "imageHash": -761553804,
+      "playedAudioBytes": 422400,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 25,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "B",
+    "id": "viewer-cannot-use-proxy",
+    "action": "web-attempt",
+    "status": "passed",
+    "observation": {
+      "allowed": false
+    }
+  },
+  {
+    "role": "B",
+    "id": "volume",
+    "action": "sound-volume",
+    "status": "passed",
+    "observation": {
+      "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "host": false,
+      "browser": false,
+      "working": true,
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "paintedFrames": 0,
+      "controller": false,
+      "encodedFrames": 0,
+      "receivedFrames": 3,
+      "receivedAudioBytes": 220800,
+      "imageHash": -658125826,
+      "playedAudioBytes": 86400,
+      "soundActive": true,
+      "playbackStarts": 1,
+      "serverStatus": "OFF",
+      "channelResumes": 4,
+      "webEnabled": true,
+      "webOpened": 0,
+      "webDownloaded": 0,
+      "webUploaded": 0
+    }
+  },
+  {
+    "role": "server",
+    "id": "final-route-state",
+    "action": "state",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "working": true,
+      "watts": 149.9964770261964,
+      "revision": 3,
+      "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "epoch": "71bb5994-f63f-4b76-a588-1dada2653516",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 1
+      },
+      "webRouting": {
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": true,
+          "opened": 10,
+          "downloaded": 1030,
+          "uploaded": 4700
+        }
+      },
+      "position": 9.720316,
+      "paused": false,
+      "imageHash": 296658327,
+      "imageBytes": 33584
+    }
+  },
+  {
+    "role": "server",
+    "id": "handoff-route-state",
+    "action": "state",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "working": true,
+      "watts": 149.9964770261964,
+      "revision": 3,
+      "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "epoch": "15661e86-bea3-46b2-a115-98da99aee53e",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 1
+      },
+      "webRouting": {
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": true,
+          "opened": 25,
+          "downloaded": 1245199,
+          "uploaded": 11598
+        }
+      },
+      "position": 7.2265,
+      "paused": false,
+      "imageHash": -1626528063,
+      "imageBytes": 34152
+    }
+  },
+  {
+    "role": "server",
+    "id": "power-off-revokes-route",
+    "action": "state",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "working": false,
+      "watts": 0.0,
+      "revision": 3,
+      "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "epoch": "15661e86-bea3-46b2-a115-98da99aee53e",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 0
+      },
+      "webRouting": {
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": false,
+          "opened": 0,
+          "downloaded": 0,
+          "uploaded": 0
+        }
+      },
+      "position": 7.853775,
+      "paused": false,
+      "imageHash": 1,
+      "imageBytes": 0
+    }
+  },
+  {
+    "role": "server",
+    "id": "power-off",
+    "action": "power",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "working": false,
+      "watts": 0.0,
+      "revision": 3,
+      "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "epoch": "15661e86-bea3-46b2-a115-98da99aee53e",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 1
+      },
+      "webRouting": {
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": false,
+          "opened": 0,
+          "downloaded": 0,
+          "uploaded": 0
+        }
+      },
+      "position": 7.853775,
+      "paused": false,
+      "imageHash": 1,
+      "imageBytes": 0
+    }
+  },
+  {
+    "role": "server",
+    "id": "power-on",
+    "action": "power",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html?restored=1",
+      "working": true,
+      "watts": 149.9964770261964,
+      "revision": 3,
+      "host": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+      "epoch": "71bb5994-f63f-4b76-a588-1dada2653516",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 1
+      },
+      "webRouting": {
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": true,
+          "opened": 0,
+          "downloaded": 0,
+          "uploaded": 0
+        }
+      },
+      "position": 7.952775,
+      "paused": false,
+      "imageHash": 1,
+      "imageBytes": 0
+    }
+  },
+  {
+    "role": "server",
+    "id": "routed-state",
+    "action": "state",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "working": true,
+      "watts": 149.9964818859475,
+      "revision": 1,
+      "host": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "controller": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "epoch": "d46d3623-a675-4dd4-9b82-932d1b0178e3",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 1
+      },
+      "webRouting": {
+        "MirrorA": {
+          "enabled": true,
+          "hostingAllowed": true,
+          "opened": 39,
+          "downloaded": 1246538,
+          "uploaded": 17281
+        }
+      },
+      "position": 2.249,
+      "paused": false,
+      "imageHash": 1552402617,
+      "imageBytes": 34499
+    }
+  },
+  {
+    "role": "server",
+    "id": "viewer-permission-denied",
+    "action": "state",
+    "status": "passed",
+    "observation": {
+      "url": "http://fixture.eamedia.test:8765/index.html",
+      "working": true,
+      "watts": 149.99647945891738,
+      "revision": 1,
+      "host": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+      "epoch": "d46d3623-a675-4dd4-9b82-932d1b0178e3",
+      "serverBrowser": {
+        "status": "OFF",
+        "viewers": 2
+      },
+      "webRouting": {
+        "MirrorA": {
+          "enabled": true,
+          "hostingAllowed": true,
+          "opened": 149,
+          "downloaded": 1257971,
+          "uploaded": 68310
+        },
+        "MirrorB": {
+          "enabled": true,
+          "hostingAllowed": false,
+          "opened": 0,
+          "downloaded": 0,
+          "uploaded": 0
+        }
+      },
+      "position": 12.008,
+      "paused": false,
+      "imageHash": -817831991,
+      "imageBytes": 33980
+    }
+  }
+]

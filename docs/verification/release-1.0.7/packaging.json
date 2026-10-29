@@ -1,0 +1,14 @@
+[
+  {
+    "name": "EAMedia-1.0.7-server.jar",
+    "bytes": 609876,
+    "sha256": "fd71d0a41f257b043b2b77cd08312a9e42f21ba1b18409b0ff2c32ff1131d6ca",
+    "chromiumPayload": false
+  },
+  {
+    "name": "EAMedia-1.0.7.jar",
+    "bytes": 764692252,
+    "sha256": "0d477e6a0de1ed7fa001706caee7e0b186285ae5edaa35d805cbdf9d6f4500aa",
+    "chromiumPayload": true
+  }
+]

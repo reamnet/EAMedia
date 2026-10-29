@@ -16,7 +16,7 @@ class EAMedia(bus: IEventBus) {
             // Required channel negotiation prevents mixing active media devices with a client
             // that only has ELN's inert placeholders or the old client-local TV protocol.
             // Older relays impose a lower video budget and would silently drop 540p frames.
-            val registrar=event.registrar("5")
+            val registrar=event.registrar("6")
             registrar.playToClient(MediaPresence.TYPE,MediaPresence.CODEC) { _,_-> }
             registrar.playToServer(TelevisionCommand.TYPE,TelevisionCommand.CODEC) { packet,context->
                 context.enqueueWork { (context.player() as? net.minecraft.server.level.ServerPlayer)?.let { TelevisionNetwork.handle(it,packet) } }
@@ -31,6 +31,9 @@ class EAMedia(bus: IEventBus) {
             registrar.playToClient(TelevisionHostInput.TYPE,TelevisionHostInput.CODEC) { packet,context->
                 context.enqueueWork { TelevisionMirrorClient.input(packet) }
             }
+            registrar.executesOn(net.neoforged.neoforge.network.registration.HandlerThread.NETWORK)
+                .playBidirectional(mods.eamedia.web.WebPacket.TYPE,mods.eamedia.web.WebPacket.CODEC,mods.eamedia.web.WebRoutingNetwork::handle)
+
         }
         Eln.LOGGER.info("Electrical Age Media loaded; TV hosting mode {}; jukebox playback remains client-side",if(TelevisionHosting.serverHosted)"server" else "client")
     }

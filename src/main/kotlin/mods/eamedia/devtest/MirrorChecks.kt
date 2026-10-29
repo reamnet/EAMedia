@@ -82,6 +82,7 @@ object MirrorServerChecks {
                     addProperty("url",tv.mediaUrl);addProperty("working",tv.working);addProperty("watts",tv.resistor.power);addProperty("revision",tv.mediaRevision)
                     addProperty("host",tv.sharedTv.host?.toString());addProperty("controller",tv.sharedTv.controller?.toString());addProperty("epoch",tv.sharedTv.hostEpoch.toString())
                     add("serverBrowser",com.google.gson.Gson().toJsonTree(ServerTelevisions.diagnostic(tv)))
+                    add("webRouting",com.google.gson.Gson().toJsonTree(w.server.playerList.players.associate{it.gameProfile.name to mods.eamedia.web.WebRoutingNetwork.diagnostic(it)}))
                     val sample=tv.sharedTv.snapshot();addProperty("position",sample.position);addProperty("paused",sample.paused)
                     val bytes=tv.mirrorRelay.cached.flatMap { it.bytes.asIterable() }.toByteArray();addProperty("imageHash",bytes.contentHashCode());addProperty("imageBytes",bytes.size)
                     if(java.lang.Boolean.getBoolean("eamedia.poleFixtures"))add("poles",JsonParser.parseString(Class.forName("mods.eln.devtest.PoleAttachmentChecks").getMethod("report").invoke(null).toString()))
@@ -110,6 +111,7 @@ object MirrorClientChecks {
         private val at=BlockPos(256,80,256)
         private fun render()=(mc.level?.getBlockEntity(at) as? TransparentNodeEntity)?.elementRender as? MediaRender
         @Volatile private var page=""
+        @Volatile private var webAttempt: Boolean?=null
         override fun begin(c: JsonObject) {
             when(action(c)) {
                 "join"->{ mc.options.renderDistance().set(4);ConnectScreen.startConnecting(mc.screen ?: TitleScreen(),mc,ServerAddress.parseString("127.0.0.1:25575"),ServerData("TV mirror check","127.0.0.1:25575",ServerData.Type.OTHER),false,null) }
@@ -127,6 +129,15 @@ object MirrorClientChecks {
                 "sound-stall"->Thread.sleep(500)
                 "teleport"->mc.connection!!.sendCommand(c["command"].asString)
                 "page"->{ page="" }
+                "web-attempt"->{
+                    webAttempt=null
+                    Thread.ofVirtual().start {
+                        webAttempt=try {
+                            val proxy=java.net.Proxy(java.net.Proxy.Type.SOCKS,java.net.InetSocketAddress("127.0.0.1",mods.eamedia.web.BrowserWebProxy.client.start()))
+                            java.net.Socket(proxy).use{socket->socket.connect(java.net.InetSocketAddress.createUnresolved("fixture.eamedia.test",8765),5000)};true
+                        }catch(_: Exception){false}
+                    }
+                }
                 "pole-open"->{
                     val pos=BlockPos(c["x"].asInt,80,256);val player=mc.player!!
                     player.inventory.selected=(0..8).first { player.inventory.getItem(it).isEmpty }
@@ -145,6 +156,7 @@ object MirrorClientChecks {
             if(action(c)=="boot")return if(mc.screen is TitleScreen && mc.overlay==null)JsonObject() else null
             if(action(c)=="join")return if(mc.player!=null && mc.screen==null)JsonObject().apply { addProperty("uuid",mc.player!!.uuid.toString());addProperty("integrated",mc.singleplayerServer!=null) } else null
             if(action(c)=="quit")return if(mc.player==null)JsonObject() else null
+            if(action(c)=="web-attempt")return webAttempt?.let{result->check(result==c["allowed"].asBoolean);JsonObject().apply{addProperty("allowed",result)}}
             if(action(c).startsWith("pole-")) {
                 if(ticks<20)return null
                 val pos=BlockPos(c["x"].asInt,80,256)
@@ -185,6 +197,8 @@ object MirrorClientChecks {
                 addProperty("paintedFrames",tv.paintedFrames);addProperty("controller",tv.isController);addProperty("encodedFrames",tv.mirror.encodedFrames);addProperty("receivedFrames",tv.mirror.receivedFrames);addProperty("receivedAudioBytes",tv.mirror.receivedAudioBytes);addProperty("imageHash",tv.mirror.frameHash)
                 addProperty("playedAudioBytes",tv.mirror.playedAudioBytes);addProperty("soundActive",tv.mirror.soundActive);addProperty("playbackStarts",tv.mirror.playbackStarts);addProperty("serverStatus",r.tvServerStatus)
                 addProperty("channelResumes",tv.mirror.channelResumes)
+                val web=mods.eamedia.web.BrowserWebProxy.client
+                addProperty("webEnabled",web.enabled);addProperty("webOpened",web.opened.get());addProperty("webDownloaded",web.downloaded.get());addProperty("webUploaded",web.uploaded.get())
             }
         }
         override fun photo(id: String) {
