@@ -14,10 +14,12 @@ import kotlin.test.*
 
 class ServerTelevisionTest {
     @get:Rule val temp=TemporaryFolder()
-    @Test fun pageAudioCapturePreservesPageMuteAndVolumeWithoutAnyViewersGain() {
+    @Test fun pageAudioCapturePreservesPageMuteAndVolumeWithoutAnyViewersGain()=captureCheck(false)
+    @Test fun clientHostSpeakerIsSilentWithoutChangingTheCapturedPageVolume()=captureCheck(true)
+    private fun captureCheck(relay: Boolean) {
         val capture=javaClass.getResourceAsStream("/assets/eln/browser/mirror-capture.js")!!.bufferedReader().use { it.readText() }
         val script="""
-            globalThis.window=globalThis;const handlers={},gains=[];let periodic,ended,captures=0;
+            globalThis.window=globalThis;const handlers={},gains=[],elementSources=[];let periodic,ended,captures=0;
             class AudioNode {connect(node){this.destination=node;return node;}disconnect(){this.disconnected=true;}}
             class AudioDestinationNode extends AudioNode {}
             class MediaStream {constructor(tracks){this.tracks=tracks;}getAudioTracks(){return this.tracks;}}
@@ -26,7 +28,7 @@ class ServerTelevisionTest {
                 createScriptProcessor(){return new AudioNode();}
                 createGain(){const n=new AudioNode();n.gain={value:1};gains.push(n);return n;}
                 createMediaStreamSource(){return new AudioNode();}
-                createMediaElementSource(){return new AudioNode();}
+                createMediaElementSource(){const source=new AudioNode();elementSources.push(source);return source;}
                 createMediaStreamDestination(){return Object.assign(new AudioNode(),{stream:new MediaStream([1])});}
                 resume(){return Promise.resolve();}
             }
@@ -36,16 +38,25 @@ class ServerTelevisionTest {
             globalThis.document={querySelectorAll:()=>[media],addEventListener:(name,fn)=>handlers[name]=fn};
             globalThis.setInterval=fn=>periodic=fn;globalThis.eaTvCapture=()=>{};
             // A viewer may be muted locally. It must never scale what the server captures.
-            window.__elnTVGain=0;
+            window.__elnTVGain=0;window.__eaTVRelayAudio=$relay;
             $capture
             function equal(a,b){if(Math.abs(a-b)>1e-9)throw Error(a+' != '+b);}
-            equal(media.volume,.7);equal(gains[gains.length-1].gain.value,.7);
-            media.muted=true;handlers.volumechange();equal(gains[gains.length-1].gain.value,0);
-            media.muted=false;media.volume=.3;periodic();equal(gains[gains.length-1].gain.value,.3);
-            equal(media.volume,.3);
-            const previousGain=gains[gains.length-1];ended();periodic();equal(captures,2);
-            if(!previousGain.disconnected)throw Error('Ended source was retained');
-            equal(gains[gains.length-1].gain.value,.3);console.log('Server capture checks passed');
+            equal(media.volume,.7);
+            if(window.__eaTVRelayAudio){
+                equal(elementSources.length,1);equal(captures,0);
+                // HTML media enters our processor, whose only native output has zero gain.
+                equal(elementSources[0].destination.destination.gain.value,0);
+                media.muted=true;handlers.volumechange();media.muted=false;media.volume=.3;periodic();equal(media.volume,.3);
+                equal(elementSources.length,1);
+            }else{
+                const capturedGain=gains.find(g=>g.gain.value===.7);equal(capturedGain.gain.value,.7);
+                media.muted=true;handlers.volumechange();equal(capturedGain.gain.value,0);
+                media.muted=false;media.volume=.3;periodic();equal(capturedGain.gain.value,.3);equal(media.volume,.3);
+                const previousGain=capturedGain;ended();periodic();equal(captures,2);
+                if(!previousGain.disconnected)throw Error('Ended source was retained');
+                equal(gains[gains.length-1].gain.value,.3);
+            }
+            console.log('Server capture checks passed');
         """.trimIndent()
         val file=temp.root.toPath().resolve("capture.js");Files.writeString(file,script)
         val executable=BundledMediaRuntime(temp.root.toPath().resolve("tools")).resolve("quickjs")
@@ -56,7 +67,7 @@ class ServerTelevisionTest {
         }finally{process.destroyForcibly()}
     }
     @Test fun noPlayerCanBecomeTheHostOrPublishAPlaybackReport() {
-        val tv=SharedTelevision();val first=UUID.randomUUID();val second=UUID.randomUUID()
+        val tv=SharedTelevision(serverHosted=true);val first=UUID.randomUUID();val second=UUID.randomUUID()
         tv.claim(first,false);tv.claim(first,true);assertNull(tv.host)
         tv.startServerHost();val epoch=tv.hostEpoch
         val state=TelevisionPlayback(10.0,false,1.0,30.0,false,true)

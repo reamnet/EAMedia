@@ -14,7 +14,7 @@ import kotlin.test.*
 class SharedTelevisionTest {
     private val a=UUID(1,1);private val b=UUID(2,2);private val c=UUID(3,3)
     @Test fun serverHostNeverMovesWhenControllersOrViewersLeave() {
-        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();val epoch=tv.hostEpoch
+        var now=0L;val tv=SharedTelevision(serverHosted=true) { now };tv.startServerHost();val epoch=tv.hostEpoch
         assertTrue(tv.claim(a,false));assertTrue(tv.claim(b,false));assertEquals(SharedTelevision.SERVER_HOST,tv.host)
         assertTrue(tv.claim(b,true));assertEquals(b,tv.controller);assertFalse(tv.claim(c,true))
         tv.leave(b);assertTrue(tv.claim(c,true));assertEquals(SharedTelevision.SERVER_HOST,tv.host);assertEquals(epoch,tv.hostEpoch)
@@ -23,7 +23,7 @@ class SharedTelevisionTest {
         tv.stopServerHost();assertNull(tv.host);tv.startServerHost();assertNotEquals(epoch,tv.hostEpoch)
     }
     @Test fun playbackClockIsSharedPowerAwareAndNotAdvancedWhileUnloaded() {
-        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false);tv.running(true)
+        var now=0L;val tv=SharedTelevision(serverHosted=true) { now };tv.startServerHost();tv.claim(a,false);tv.running(true)
         assertTrue(tv.report(SharedTelevision.SERVER_HOST,TelevisionPlayback(12.0,false,1.0,100.0,false,true),1))
         now=2000;assertEquals(14.0,tv.snapshot().position)
         tv.running(false);now=10_000;assertEquals(14.0,tv.snapshot().position)
@@ -32,7 +32,7 @@ class SharedTelevisionTest {
         now=12_000;assertEquals(15.0,tv.snapshot().position)
     }
     @Test fun staleOrUntrustedPlaybackReportsCannotReplaceHostState() {
-        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false)
+        var now=0L;val tv=SharedTelevision(serverHosted=true) { now };tv.startServerHost();tv.claim(a,false)
         val s=TelevisionPlayback(8.0,false,1.0,20.0,false,true)
         assertFalse(tv.report(b,s,1));assertFalse(tv.report(SharedTelevision.SERVER_HOST,s.copy(position=Double.NaN),1))
         assertTrue(tv.report(SharedTelevision.SERVER_HOST,s,1));assertFalse(tv.report(SharedTelevision.SERVER_HOST,s.copy(position=9.0),2))
@@ -40,9 +40,9 @@ class SharedTelevisionTest {
         now=7000;tv.claim(b,false);assertFalse(tv.report(a,s,3));tv.stopServerHost();tv.startServerHost();assertTrue(tv.report(SharedTelevision.SERVER_HOST,s,1))
     }
     @Test fun restartRetainsResumePositionButNeverAnOldHostOrControlLease() {
-        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false);tv.claim(b,true);tv.running(true)
+        var now=0L;val tv=SharedTelevision(serverHosted=true) { now };tv.startServerHost();tv.claim(a,false);tv.claim(b,true);tv.running(true)
         tv.report(SharedTelevision.SERVER_HOST,TelevisionPlayback(30.0,false,1.5,100.0,false,true),1);now=2000
-        val tag=CompoundTag().also(tv::write);val copy=SharedTelevision { now+86_400_000 }.apply { read(tag) }
+        val tag=CompoundTag().also(tv::write);val copy=SharedTelevision(serverHosted=true) { now+86_400_000 }.apply { read(tag) }
         assertEquals(33.0,copy.snapshot().position);assertNull(copy.host);assertNull(copy.controller);assertNotEquals(tv.session,copy.session)
         tag.getCompound("televisionPlayback").putDouble("position",Double.POSITIVE_INFINITY);copy.read(tag);assertFalse(copy.snapshot().known)
     }

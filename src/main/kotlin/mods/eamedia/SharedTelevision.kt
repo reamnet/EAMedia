@@ -11,7 +11,12 @@ data class TelevisionPlayback(val position: Double=0.0,val paused: Boolean=false
     companion object { const val MAX_SECONDS=31_536_000.0 }
 }
 
-class SharedTelevision(private val clock: ()->Long={ System.nanoTime()/1_000_000 }) {
+/** Client hosting is the default; server rendering is an explicit server administrator option. */
+object TelevisionHosting {
+    val serverHosted get()=System.getProperty("eamedia.tvHosting","client").equals("server",ignoreCase=true)
+}
+
+class SharedTelevision(val serverHosted: Boolean=TelevisionHosting.serverHosted,private val clock: ()->Long={ System.nanoTime()/1_000_000 }) {
     /** Replaced on every element load, preventing delayed controls from reaching a replacement TV. */
     val session=UUID.randomUUID()
     private var playback=TelevisionPlayback()
@@ -20,12 +25,14 @@ class SharedTelevision(private val clock: ()->Long={ System.nanoTime()/1_000_000
     private var owner: UUID?=null
     private var ownerUntil=0L
     private var serverOnline=false
+    private var hostId: UUID?=null
+    private var hostUntil=0L
     var hostEpoch=UUID.randomUUID();private set
     private val viewers=LinkedHashMap<UUID,Long>()
     private var lastReport=Long.MIN_VALUE
     private var sequence=-1L
     val controller get()=owner.takeIf { clock()<ownerUntil }
-    val host get()=if(serverOnline)SERVER_HOST else null
+    val host get()=if(serverHosted) { if(serverOnline)SERVER_HOST else null } else hostId.takeIf { clock()<hostUntil }
     val interactive get()=controller!=null
     val activeViewers get()=viewers.filterValues { clock()<it }.keys
     fun snapshot(): TelevisionPlayback {
@@ -42,6 +49,10 @@ class SharedTelevision(private val clock: ()->Long={ System.nanoTime()/1_000_000
         val now=clock()
         if(!interactive) {
             viewers.entries.removeIf { it.value<=now };viewers[player]=now+LEASE_MILLIS
+            if(!serverHosted) {
+                if(host==null) { hostId=player;hostUntil=now+HOST_LEASE_MILLIS;hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1 }
+                else if(hostId==player)hostUntil=now+HOST_LEASE_MILLIS
+            }
             return true
         }
         if(controller!=null && controller!=player)return false
@@ -49,8 +60,8 @@ class SharedTelevision(private val clock: ()->Long={ System.nanoTime()/1_000_000
         return true
     }
     fun release(player: UUID) { if(controller==player)ownerUntil=0 }
-    fun leave(player: UUID) { viewers.remove(player);release(player) }
-    fun startServerHost(){serverOnline=true;hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1}
+    fun leave(player: UUID) { viewers.remove(player);release(player);if(!serverHosted && host==player)hostUntil=0 }
+    fun startServerHost(){if(!serverHosted)return;serverOnline=true;hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1}
     fun stopServerHost(){serverOnline=false}
     fun report(player: UUID,next: TelevisionPlayback,nextSequence: Long): Boolean {
         val now=clock()
@@ -71,10 +82,10 @@ class SharedTelevision(private val clock: ()->Long={ System.nanoTime()/1_000_000
         val state=TelevisionPlayback(d.getDouble("position"),d.getBoolean("paused"),if(d.contains("rate"))d.getDouble("rate") else 1.0,
             d.getDouble("duration"),d.getBoolean("live"),d.getBoolean("known"))
         playback=state.takeIf { it.valid() } ?: TelevisionPlayback();sampled=clock();running=false
-        owner=null;ownerUntil=0;serverOnline=false;hostEpoch=UUID.randomUUID();viewers.clear();lastReport=Long.MIN_VALUE;sequence=-1
+        owner=null;ownerUntil=0;serverOnline=false;hostId=null;hostUntil=0;hostEpoch=UUID.randomUUID();viewers.clear();lastReport=Long.MIN_VALUE;sequence=-1
     }
     companion object {
         val SERVER_HOST=UUID(0,1)
-        const val LEASE_MILLIS=6000L;const val MIN_REPORT_MILLIS=100L
+        const val LEASE_MILLIS=6000L;const val HOST_LEASE_MILLIS=15000L;const val MIN_REPORT_MILLIS=100L
     }
 }

@@ -30,7 +30,7 @@ object TelevisionNetwork {
     fun handle(player: ServerPlayer,packet: TelevisionCommand) {
         val world=player.serverLevel();val p=packet.pos
         val background=packet.action in listOf(TelevisionCommand.OBSERVE,TelevisionCommand.REPORT,TelevisionCommand.PAGE_CHANGED,TelevisionCommand.LEAVE)
-        if(!world.hasChunkAt(p) || player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>if(background)1024.0 else 64.0)return
+        if(!world.hasChunkAt(p) || packet.action!=TelevisionCommand.LEAVE && player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>if(background)1024.0 else 64.0)return
         val node=(world.getBlockEntity(p) as? TransparentNodeEntity)?.node as? TransparentNode ?: return
         val tv=node.element as? MediaElement ?: return
         if(tv.kind!=MediaKind.TV || packet.session!=tv.sharedTv.session || packet.revision!=tv.mediaRevision)return
@@ -38,6 +38,12 @@ object TelevisionNetwork {
         when(packet.action) {
             TelevisionCommand.CLAIM->if(shared.claim(player.uuid,true))tv.needPublish()
             TelevisionCommand.OBSERVE->if(tv.working) {
+                // A healthy host keeps its lease through short client stalls. A vanished
+                // or out-of-range host is replaced on the next observation, without waiting.
+                if(!shared.serverHosted)shared.host?.let { id->
+                    val host=world.server.playerList.getPlayer(id)
+                    if(host==null || host.serverLevel()!==world || host.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)shared.leave(id)
+                }
                 val fresh=player.uuid !in shared.activeViewers
                 shared.claim(player.uuid,false);ServerTelevisions.observe(tv,world,p);tv.mirrorRelay.reset(shared.session,shared.hostEpoch,tv.mediaRevision);tv.needPublish()
                 if(fresh && shared.host!=player.uuid)tv.mirrorRelay.cached.forEach { PacketDistributor.sendToPlayer(player,it) }
@@ -45,13 +51,54 @@ object TelevisionNetwork {
             TelevisionCommand.RELEASE->{ shared.release(player.uuid);tv.needPublish() }
             TelevisionCommand.LEAVE->{ shared.leave(player.uuid);tv.needPublish() }
             TelevisionCommand.NAVIGATE->if(packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null && shared.claim(player.uuid,true))tv.playMedia(packet.value)
-            TelevisionCommand.BACK,TelevisionCommand.FORWARD,TelevisionCommand.RELOAD->if(shared.claim(player.uuid,true))tv.navigateHistory(packet.action)
-            TelevisionCommand.PAGE_CHANGED->return // Only the server worker may update its current page.
+            TelevisionCommand.BACK,TelevisionCommand.FORWARD,TelevisionCommand.RELOAD->if(shared.claim(player.uuid,true)) {
+                if(shared.serverHosted)tv.navigateHistory(packet.action)
+                else forwardInput(tv,player,p,when(packet.action){TelevisionCommand.BACK->"{\"type\":\"back\"}";TelevisionCommand.FORWARD->"{\"type\":\"forward\"}";else->"{\"type\":\"reload\"}"})
+            }
+            TelevisionCommand.PAGE_CHANGED->if(!shared.serverHosted && tv.working && shared.host==player.uuid && packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null)tv.browserPageChanged(packet.value)
             TelevisionCommand.INPUT->{
                 if(!tv.working || shared.controller!=player.uuid || !tv.mirrorRelay.inputBudget.accept(1) || !validInput(packet.value))return
-                ServerTelevisions.input(tv,packet.value)
+                if(shared.serverHosted)ServerTelevisions.input(tv,packet.value) else forwardInput(tv,player,p,packet.value)
             }
-            TelevisionCommand.REPORT->return // Browser playback reports never come from a player.
+            TelevisionCommand.REPORT->{
+                if(shared.serverHosted || !tv.working || shared.host!=player.uuid || packet.value.length>1024)return
+                val sample=parsePlayback(packet.value) ?: return
+                if(shared.report(player.uuid,sample,packet.sequence))tv.needPublish()
+            }
+        }
+    }
+    private fun forwardInput(tv: MediaElement,controller: ServerPlayer,p: BlockPos,value: String) {
+        val world=controller.serverLevel()
+        val shared=tv.sharedTv
+        val host=shared.host?.let(world.server.playerList::getPlayer) ?: return
+        if(host.serverLevel()!==world || host.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)return
+        PacketDistributor.sendToPlayer(host,TelevisionHostInput(p,shared.session,shared.hostEpoch,tv.mediaRevision,controller.uuid,value))
+    }
+    fun stream(player: ServerPlayer,packet: TelevisionStream) {
+        val world=player.serverLevel();val p=packet.pos
+        if(!world.hasChunkAt(p) || player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)return
+        val tv=((world.getBlockEntity(p) as? TransparentNodeEntity)?.node as? TransparentNode)?.element as? MediaElement ?: return
+        val shared=tv.sharedTv
+        if(tv.kind!=MediaKind.TV || shared.serverHosted || !tv.working || shared.host!=player.uuid || packet.session!=shared.session || packet.epoch!=shared.hostEpoch || packet.revision!=tv.mediaRevision || packet.sequence<0)return
+        val relay=tv.mirrorRelay;relay.reset(shared.session,shared.hostEpoch,tv.mediaRevision)
+        val packets=when(packet.kind) {
+            TelevisionStream.VIDEO->{
+                if(!relay.videoBudget.accept(packet.bytes.size))return
+                val jpeg=relay.video.accept(packet) ?: return
+                if(jpeg.size<4 || jpeg[0]!=0xff.toByte() || jpeg[1]!=0xd8.toByte())return
+                TelevisionStream.split(p,packet.session,packet.epoch,packet.revision,packet.sequence,jpeg).also { relay.cached=it }
+            }
+            TelevisionStream.AUDIO->{
+                if(packet.parts!=1 || packet.part!=0 || packet.bytes.size !in 4..8192 || packet.bytes.size%4!=0 || packet.sequence<=relay.audioSequence || !relay.audioBudget.accept(packet.bytes.size))return
+                relay.audioSequence=packet.sequence;listOf(packet)
+            }
+            else->return
+        }
+        for(id in shared.activeViewers) {
+            if(id==player.uuid)continue
+            val watcher=world.server.playerList.getPlayer(id) ?: continue
+            if(watcher.serverLevel()!==world || watcher.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024) { shared.leave(id);continue }
+            packets.forEach { PacketDistributor.sendToPlayer(watcher,it) }
         }
     }
     internal fun validInput(value: String): Boolean=try {
@@ -65,6 +112,7 @@ object TelevisionNetwork {
                 "keyDown","keyUp"->d["key"].asInt in 0..512 && d["scan"].asInt in 0..65535 && d["mods"].asInt in 0..63
                 "char"->d["text"].asString.length in 1..2 && d["mods"].asInt in 0..63
                 "paste"->d["text"].asString.length in 1..256
+                "back","forward","reload"->true
                 else->false
             }
         }

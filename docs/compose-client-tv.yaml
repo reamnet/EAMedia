@@ -1,0 +1,29 @@
+# Client-hosted TVs need no custom Docker image or Xvfb.
+# Put EAMedia-1.0.5-server.jar (or the full jar) in ./data/mods/.
+# Every client needs the full EAMedia-1.0.5.jar. Install one addon variant per side.
+services:
+  minecraft:
+    image: itzg/minecraft-server:java21
+    container_name: minecraft-neoforge
+    init: true
+    restart: unless-stopped
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: "NEOFORGE"
+      VERSION: "1.21.1"
+      MEMORY: "18G"
+      TZ: "America/New_York"
+      JVM_OPTS: "-Deamedia.tvHosting=client"
+    volumes:
+      - ./data:/data
+    mem_limit: 22g
+    stop_grace_period: 2m
+    stdin_open: true
+    tty: true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

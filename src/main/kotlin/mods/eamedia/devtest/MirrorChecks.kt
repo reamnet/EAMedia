@@ -182,7 +182,7 @@ object MirrorClientChecks {
             if(c.has("hash") && tv.mirror.frameHash!=c["hash"].asInt)return null
             return JsonObject().apply {
                 addProperty("uuid",mc.player!!.uuid.toString());addProperty("host",tv.isHost);addProperty("browser",tv.browser!=null);addProperty("working",r.working);addProperty("url",r.mediaUrl)
-                addProperty("controller",tv.isController);addProperty("encodedFrames",tv.mirror.encodedFrames);addProperty("receivedFrames",tv.mirror.receivedFrames);addProperty("receivedAudioBytes",tv.mirror.receivedAudioBytes);addProperty("imageHash",tv.mirror.frameHash)
+                addProperty("paintedFrames",tv.paintedFrames);addProperty("controller",tv.isController);addProperty("encodedFrames",tv.mirror.encodedFrames);addProperty("receivedFrames",tv.mirror.receivedFrames);addProperty("receivedAudioBytes",tv.mirror.receivedAudioBytes);addProperty("imageHash",tv.mirror.frameHash)
                 addProperty("playedAudioBytes",tv.mirror.playedAudioBytes);addProperty("soundActive",tv.mirror.soundActive);addProperty("playbackStarts",tv.mirror.playbackStarts);addProperty("serverStatus",r.tvServerStatus)
                 addProperty("channelResumes",tv.mirror.channelResumes)
             }

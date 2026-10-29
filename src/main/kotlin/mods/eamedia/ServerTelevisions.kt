@@ -34,7 +34,7 @@ object ServerTelevisions {
         val process=ServerBrowserProcess(profile,tv.mediaUrl,Gson().toJson(tv.sharedTv.snapshot()))
     }
     fun observe(tv: MediaElement,world: ServerLevel,pos: BlockPos) {
-        if(!tv.working || sessions.containsKey(tv.sharedTv.session))return
+        if(!tv.sharedTv.serverHosted || !tv.working || sessions.containsKey(tv.sharedTv.session))return
         if(sessions.size>=limit){status(tv,"CAPACITY");return}
         tv.sharedTv.startServerHost();tv.mirrorRelay.reset(tv.sharedTv.session,tv.sharedTv.hostEpoch,tv.mediaRevision)
         val session=Session(tv,world,pos.immutable());sessions[tv.sharedTv.session]=session

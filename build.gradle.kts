@@ -57,8 +57,8 @@ tasks.processResources {
     filesMatching("META-INF/neoforge.mods.toml") { expand(mapOf("version" to project.version.toString())) }
 }
 tasks.named<Test>("test") { useJUnitPlatform() }
-// Small variant for jukebox-only servers. TV-hosting servers require the full jar
-// because their isolated browser workers extract the bundled Chromium payload.
+// Small variant supports client-hosted TVs and jukebox server logic. Optional
+// server-owned TV browser workers need the full bundled Chromium payload.
 val serverJar by tasks.registering(Jar::class) {
     archiveClassifier.set("server")
     dependsOn(tasks.named("jar"))

@@ -18,7 +18,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import kotlin.math.abs
 
-/** Passive electrical device; TV I/O uses a server worker, jukebox playback uses clients. */
+/** Passive electrical device; media rendering stays outside the electrical simulation. */
 class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor): TransparentNodeElement(node,descriptor),CordDevice,RemoteSwitchableDevice,StandaloneDeviceControls {
     val kind=(descriptor as MediaDescriptor).kind
     var settings=kind.defaults;private set
@@ -144,7 +144,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
             out.writeUTF(sharedTv.host?.toString() ?: "");out.writeUTF(sharedTv.hostEpoch.toString())
             val s=sharedTv.snapshot();out.writeDouble(s.position);out.writeBoolean(s.paused);out.writeDouble(s.rate);out.writeDouble(s.duration);out.writeBoolean(s.live);out.writeBoolean(s.known)
             out.writeBoolean(historyIndex>0);out.writeBoolean(historyIndex>=0 && historyIndex<history.lastIndex)
-            out.writeUTF(tvServerStatus)
+            out.writeUTF(tvServerStatus);out.writeBoolean(sharedTv.serverHosted)
         }
     }
     override fun networkUnserialize(input: DataInputStream): Byte {

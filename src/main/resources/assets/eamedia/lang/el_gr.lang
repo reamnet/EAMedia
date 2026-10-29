@@ -39,14 +39,19 @@ Powered_Browser_Television.name=Powered Browser Television
 Powered_Web_Jukebox.name=Powered Web Jukebox
 
 # src/main/kotlin/mods/eamedia/TelevisionBrowser.kt
+Browser_could_not_start;_turn_the_TV_off_and_on_to_retry=Browser could not start; turn the TV off and on to retry
+Browser_engine_unavailable;_check_MCEF_setup=Browser engine unavailable; check MCEF setup
 Enter_a_webpage_or_video_address_and_turn_on_the_TV=Enter a webpage or video address and turn on the TV
 Install_the_full_EA_Media_jar_on_the_server_for_TV_playback=Install the full EA Media jar on the server for TV playback
-Server_TV;_take_control_to_interact=Server TV; take control to interact
-Server_TV;_you_control_the_browser=Server TV; you control the browser
+Loading_webpage...=Loading webpage...
 Server_browser_failed;_check_its_worker_log=Server browser failed; check its worker log
+Shared_TV;_take_control_to_interact=Shared TV; take control to interact
+Shared_TV;_you_control_the_browser=Shared TV; you control the browser
 The_server_browser_limit_has_been_reached=The server browser limit has been reached
 The_server_needs_Xvfb_for_its_browser;_see_server_setup=The server needs Xvfb for its browser; see server setup
-Waiting_for_the_server_browser_picture=Waiting for the server browser picture
+Two_nearby_TVs_are_already_active=Two nearby TVs are already active
+Waiting_for_the_shared_TV_picture=Waiting for the shared TV picture
+Waiting_for_viewer_within_32_blocks=Waiting for viewer within 32 blocks
 
 # src/main/kotlin/mods/eamedia/TelevisionScreen.kt
 Go=Go

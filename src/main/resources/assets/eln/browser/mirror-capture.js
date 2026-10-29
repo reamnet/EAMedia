@@ -6,6 +6,7 @@
         try { window.eaTvCapture({request: value, onSuccess: () => {}, onFailure: () => {}}); } catch (_) {}
     };
     const attached = new WeakSet(), inGraph = new WeakSet(), buses = new WeakMap(), elementGains = new WeakMap();
+    const speakerSinks = new WeakMap(), elementSpeakers = new WeakMap();
     let context, processor;
     const audio = () => {
         if (context) return context;
@@ -53,10 +54,10 @@
         } else source.connect(processor);
         return true;
     };
-    // Web Audio output is tapped before the TV's local distance/master gain.
+    // Host and viewers all listen through Minecraft. Keep document capture independent
+    // of that client's volume, while routing the host's native speakers into zero gain.
     const connect = AudioNode.prototype.connect;
     AudioNode.prototype.connect = function(destination, ...args) {
-        const result = connect.call(this, destination, ...args);
         if (destination instanceof AudioDestinationNode && destination.context !== context) {
             try {
                 let bus = buses.get(destination.context);
@@ -64,7 +65,15 @@
                 connect.call(this, bus);
             } catch (_) {}
         }
-        return result;
+        if (window.__eaTVRelayAudio && destination instanceof AudioDestinationNode) {
+            let sink = speakerSinks.get(destination.context);
+            if (!sink) {
+                sink = destination.context.createGain(); sink.gain.value = 0;
+                speakerSinks.set(destination.context, sink); connect.call(sink, destination);
+            }
+            connect.call(this, sink, ...args); return destination;
+        }
+        return connect.call(this, destination, ...args);
     };
     const makeElementSource = AudioContext.prototype.createMediaElementSource;
     AudioContext.prototype.createMediaElementSource = function(media) {
@@ -74,7 +83,15 @@
     const update = () => {
         const media = Array.from(document.querySelectorAll('video,audio'));
         media.forEach(m => {
-            if (!attached.has(m) && !inGraph.has(m) && m.readyState >= 2 && typeof m.captureStream === 'function') {
+            if (window.__eaTVRelayAudio && !attached.has(m) && !inGraph.has(m) && m.readyState >= 2) {
+                try {
+                    // Once Web Audio owns an element, captureStream can become silent.
+                    // Capture its actual source directly and let only our silent processor
+                    // reach the native device. Element volume/mute remain page controls.
+                    const source = makeElementSource.call(audio(), m);
+                    source.connect(processor); elementSpeakers.set(m, source); attached.add(m);
+                } catch (_) {}
+            } else if (!window.__eaTVRelayAudio && !attached.has(m) && !inGraph.has(m) && m.readyState >= 2 && typeof m.captureStream === 'function') {
                 try { if (stream(m.captureStream(), m)) attached.add(m); } catch (_) {}
             }
             const gain = elementGains.get(m);

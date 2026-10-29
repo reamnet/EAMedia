@@ -11,6 +11,9 @@ import net.minecraft.client.sounds.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
+import net.neoforged.neoforge.network.PacketDistributor
+import mods.eamedia.server.BrowserWorker
+import java.util.Base64
 import net.minecraft.util.valueproviders.ConstantFloat
 import org.lwjgl.BufferUtils
 import java.awt.image.BufferedImage
@@ -28,15 +31,25 @@ import javax.sound.sampled.AudioFormat
 object TelevisionMirrorClient {
     private fun render(pos: net.minecraft.core.BlockPos)=((Minecraft.getInstance().level?.getBlockEntity(pos) as? TransparentNodeEntity)?.elementRender as? MediaRender)?.takeIf { it.kind==MediaKind.TV }
     fun receive(packet: TelevisionStream) { render(packet.pos)?.television?.mirror?.receive(packet) }
-
+    fun input(packet: TelevisionHostInput) {
+        val r=render(packet.pos) ?: return
+        if(r.tvSession!=packet.session || r.tvHostEpoch!=packet.epoch || r.mediaRevision!=packet.revision || r.tvHost!=Minecraft.getInstance().player?.uuid)return
+        r.television.remoteInput(packet.value,packet.controller)
+    }
 }
 
-/** Every client decodes the same server picture and plays the same server PCM stream. */
+/** One client hosts by default; every player uses the same bounded Minecraft audio path. */
 class TelevisionMirror(private val render: MediaRender): AutoCloseable {
     private val mc get()=Minecraft.getInstance()
     private data class Stamp(val session: java.util.UUID,val epoch: java.util.UUID,val revision: Int)
     @Volatile private var stamp: Stamp?=null
     private val decoding=AtomicBoolean()
+    private val encoding=AtomicBoolean()
+    private val videoSequence=AtomicLong();private val audioSequence=AtomicLong()
+    private val mixer=BrowserWorker.AudioMixer(System::nanoTime)
+    @Volatile private var hosting=false
+    @Volatile private var nextCapture=0L
+    private val audioClock=TelevisionAudioClock()
     private var assembler=TelevisionFrameAssembler()
     private var texture: DynamicTexture?=null
     private val location=ResourceLocation.fromNamespaceAndPath("eamedia","mirror/${ids.incrementAndGet()}")
@@ -48,16 +61,67 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
     val playedAudioBytes get()=pcm.consumedBytes
     val channelResumes get()=pcm.channelResumes
     val soundActive get()=sound?.let { mc.soundManager.isActive(it) } ?: false
-    val encodedFrames get()=0L
+    @Volatile var encodedFrames=0L;private set
     var receivedFrames=0L;private set
     var receivedAudioBytes=0L;private set
     @Volatile var frameHash=0;private set
     fun update() {
         val next=render.tvSession?.let { Stamp(it,render.tvHostEpoch,render.mediaRevision) }
-        if(next!=stamp) { clear();stamp=next }
+        val host=!render.tvServerHosted && render.tvHost==mc.player?.uuid && mc.player!=null
+        if(next!=stamp || host!=hosting) { clear();stopCapture();stamp=next;hosting=host }
         if(receivedAudioBytes>0)ensureSound()
     }
     private fun current(s: Stamp)=stamp==s && render.working && !render.tileEntity.isRemoved
+    fun capture(buffer: ByteBuffer,width: Int,height: Int,popup: ByteBuffer?=null,bounds: java.awt.Rectangle?=null) {
+        val s=stamp ?: return
+        if(!hosting || width!=960 || height!=540 || System.nanoTime()<nextCapture || !encoding.compareAndSet(false,true))return
+        nextCapture=System.nanoTime()+1_000_000_000L/20
+        val raw=ByteArray(width*height*4)
+        try {
+            buffer.duplicate().apply { position(0);get(raw) }
+            if(popup!=null && bounds!=null && bounds.width>0 && bounds.height>0 && popup.capacity()>=bounds.width.toLong()*bounds.height*4) {
+                val clipped=bounds.intersection(java.awt.Rectangle(0,0,width,height));val overlay=popup.duplicate()
+                for(y in clipped.y until clipped.y+clipped.height) {
+                    overlay.position(((y-bounds.y)*bounds.width+clipped.x-bounds.x)*4)
+                    overlay.get(raw,(y*width+clipped.x)*4,clipped.width*4)
+                }
+            }
+        } catch(_: Exception) { encoding.set(false);return }
+        workers.execute {
+            try {
+                val image=BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);val rgb=IntArray(width*height)
+                for(i in rgb.indices) { val p=i*4;rgb[i]=((raw[p+2].toInt() and 255) shl 16) or ((raw[p+1].toInt() and 255) shl 8) or (raw[p].toInt() and 255) }
+                image.setRGB(0,0,width,height,rgb,0,width)
+                val bytes=encodeMirror(image)
+                if(bytes==null) { encoding.set(false);return@execute }
+                mc.execute {
+                    try {
+                        if(current(s) && hosting && bytes.size<=TelevisionStream.MAX_FRAME) {
+                            val sequence=videoSequence.incrementAndGet()
+                            TelevisionStream.split(render.tileEntity.blockPos,s.session,s.epoch,s.revision,sequence,bytes).forEach(PacketDistributor::sendToServer)
+                            encodedFrames++;frameHash=bytes.contentHashCode()
+                        }
+                    } finally { encoding.set(false) }
+                }
+            } catch(_: Exception) { encoding.set(false) }
+        }
+    }
+    fun captureAudio(source: Long,value: String) {
+        if(!hosting || value.length>11000)return
+        val bytes=try { Base64.getDecoder().decode(value) }catch(_: IllegalArgumentException){return}
+        mixer.offer(source,bytes)
+    }
+    fun pumpAudio() {
+        val s=stamp ?: return
+        if(!hosting || !current(s))return
+        repeat(audioClock.claim(System.nanoTime())) {
+            val bytes=mixer.read(1200) ?: return@repeat
+            val packet=TelevisionStream(render.tileEntity.blockPos,s.session,s.epoch,s.revision,audioSequence.incrementAndGet(),TelevisionStream.AUDIO,0,1,bytes)
+            // No native/browser speaker path: the host hears exactly this captured PCM too.
+            receive(packet);PacketDistributor.sendToServer(packet)
+        }
+    }
+    fun stopCapture(){mixer.clear();audioClock.reset();nextCapture=0}
     fun receive(packet: TelevisionStream) {
         val s=stamp ?: return
         if(packet.session!=s.session || packet.epoch!=s.epoch || packet.revision!=s.revision || !current(s))return
@@ -67,27 +131,34 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
             ensureSound();pcm.offer(packet.bytes)
             return
         }
+        if(hosting)return
         val data=assembler.accept(packet) ?: return
         if(!decoding.compareAndSet(false,true))return
         workers.execute {
             try {
                 val image=decode(data)
-                mc.execute {
-                    try {
-                        if(current(s)) {
-                            var target=texture
-                            if(target==null || target.pixels?.width!=image.width || target.pixels?.height!=image.height) {
-                                if(target!=null)mc.textureManager.release(location)
-                                target=DynamicTexture(NativeImage(image.width,image.height,false));texture=target;mc.textureManager.register(location,target)
-                            }
-                            val pixels=target.pixels!!
-                            for(y in 0 until image.height)for(x in 0 until image.width) {
-                                val argb=image.getRGB(x,y);pixels.setPixelRGBA(x,y,(argb and 0xff00ff00.toInt()) or ((argb and 255) shl 16) or ((argb ushr 16) and 255))
-                            }
-                            target.upload();receivedFrames++;frameHash=data.contentHashCode()
-                        }
-                    } finally { decoding.set(false) }
-                }
+                val pixels=NativeImage(image.width,image.height,false)
+                var handedOff=false
+                try {
+                    val rgb=image.getRGB(0,0,image.width,image.height,null,0,image.width)
+                    for(y in 0 until image.height)for(x in 0 until image.width) {
+                        val argb=rgb[y*image.width+x]
+                        pixels.setPixelRGBA(x,y,(argb and 0xff00ff00.toInt()) or ((argb and 255) shl 16) or ((argb ushr 16) and 255))
+                    }
+                    mc.execute {
+                        try {
+                            if(current(s) && !hosting) {
+                                var target=texture
+                                if(target==null || target.pixels?.width!=pixels.width || target.pixels?.height!=pixels.height) {
+                                    target?.let { mc.textureManager.release(location) }
+                                    target=DynamicTexture(pixels);texture=target;mc.textureManager.register(location,target)
+                                }else { target.pixels=pixels;target.upload() }
+                                receivedFrames++;frameHash=data.contentHashCode()
+                            } else pixels.close()
+                        }finally{decoding.set(false)}
+                    }
+                    handedOff=true
+                }finally{if(!handedOff)pixels.close()}
             } catch(_: Exception) { decoding.set(false) }
         }
     }
@@ -109,10 +180,19 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
         sound?.let(mc.soundManager::stop);sound=null;pcm.close();pcm=TelevisionPcmQueue()
         assembler=TelevisionFrameAssembler();audioReceived=-1;receivedFrames=0;receivedAudioBytes=0;soundStarted=0
     }
-    override fun close() { stamp=null;clear() }
+    override fun close() { stamp=null;hosting=false;stopCapture();clear() }
     companion object {
         private val ids=AtomicLong()
         private val workers=Executors.newFixedThreadPool(2) { r->Thread(r,"EA Media TV mirror").apply { isDaemon=true } }
+        internal fun encodeMirror(image: BufferedImage): ByteArray? {
+            val scaled=BufferedImage(640,360,BufferedImage.TYPE_INT_RGB)
+            scaled.createGraphics().let { graphics->try {
+                graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                graphics.drawImage(image,0,0,640,360,null)
+            }finally{graphics.dispose()} }
+            // 40 kB at 20 fps fits the server's unchanged 800 kB/s video budget.
+            return sequenceOf(.65f,.45f,.25f,.12f).map { BrowserWorker.jpeg(scaled,it) }.firstOrNull { it.size<=40_000 }
+        }
         internal fun decode(bytes: ByteArray): BufferedImage {
             require(bytes.size<=TelevisionStream.MAX_FRAME)
             MemoryCacheImageInputStream(ByteArrayInputStream(bytes)).use { input->
@@ -171,4 +251,18 @@ private class MirrorSound(private val render: MediaRender,private val pcm: Telev
 internal fun televisionGain(volume: Double,distanceSquared: Double): Double {
     if(!volume.isFinite() || !distanceSquared.isFinite() || distanceSquared<0.0)return 0.0
     return volume.coerceIn(0.0,1.0)*(1-kotlin.math.sqrt(distanceSquared)/32).coerceIn(0.0,1.0)
+}
+
+/** Keep the 24 kHz clock when a render frame is late. At most 200 ms is caught up,
+ * fitting both the bounded sample buffer and the server's audio burst budget. */
+internal class TelevisionAudioClock {
+    private var next: Long?=null
+    fun reset(){next=null}
+    fun claim(now: Long): Int {
+        val deadline=next ?: now
+        if(now<deadline)return 0
+        val due=(1+(now-deadline)/50_000_000L).coerceAtMost(4).toInt()
+        next=if(due==4)now+50_000_000L else deadline+due*50_000_000L
+        return due
+    }
 }
