@@ -74,8 +74,11 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
     private fun current(s: Stamp)=stamp==s && render.working && !render.tileEntity.isRemoved
     fun capture(buffer: ByteBuffer,width: Int,height: Int,popup: ByteBuffer?=null,bounds: java.awt.Rectangle?=null) {
         val s=stamp ?: return
-        if(!hosting || width!=960 || height!=540 || System.nanoTime()<nextCapture || !encoding.compareAndSet(false,true))return
-        nextCapture=System.nanoTime()+1_000_000_000L/20
+        val now=System.nanoTime()
+        if(!hosting || width!=TelevisionStream.WIDTH || height!=TelevisionStream.HEIGHT || now<nextCapture || !encoding.compareAndSet(false,true))return
+        // Match the host's paint cadence without letting callback jitter halve the rate.
+        // A late frame is skipped; the encoder never builds a backlog to catch up.
+        nextCapture=maxOf(nextCapture+1_000_000_000L/TelevisionStream.FPS,now)
         val raw=ByteArray(width*height*4)
         try {
             buffer.duplicate().apply { position(0);get(raw) }
@@ -185,13 +188,10 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
         private val ids=AtomicLong()
         private val workers=Executors.newFixedThreadPool(2) { r->Thread(r,"EA Media TV mirror").apply { isDaemon=true } }
         internal fun encodeMirror(image: BufferedImage): ByteArray? {
-            val scaled=BufferedImage(640,360,BufferedImage.TYPE_INT_RGB)
-            scaled.createGraphics().let { graphics->try {
-                graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR)
-                graphics.drawImage(image,0,0,640,360,null)
-            }finally{graphics.dispose()} }
-            // 40 kB at 20 fps fits the server's unchanged 800 kB/s video budget.
-            return sequenceOf(.65f,.45f,.25f,.12f).map { BrowserWorker.jpeg(scaled,it) }.firstOrNull { it.size<=40_000 }
+            require(image.width==TelevisionStream.WIDTH && image.height==TelevisionStream.HEIGHT)
+            // Retain every browser pixel and restore 1.0.3's per-frame quality allowance.
+            // The relay budget admits this maximum frame size at the full 30 fps cap.
+            return sequenceOf(.65f,.45f,.25f,.12f).map { BrowserWorker.jpeg(image,it) }.firstOrNull { it.size<=TelevisionStream.MAX_FRAME }
         }
         internal fun decode(bytes: ByteArray): BufferedImage {
             require(bytes.size<=TelevisionStream.MAX_FRAME)

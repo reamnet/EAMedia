@@ -181,7 +181,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
                         if(!popup) {
                             mirror.capture(buffer,width,height,if(showPopup)popupGraphics else null,if(showPopup)popupSize else null)
                             val now=System.nanoTime();if(now<nextPaint)return
-                            nextPaint=maxOf(nextPaint+1_000_000_000L/30,now);paintedFrames++
+                            nextPaint=maxOf(nextPaint+1_000_000_000L/TelevisionStream.FPS,now);paintedFrames++
                             // A skipped dirty rectangle must be included on the next accepted frame.
                             super.onPaint(b,false,arrayOf(Rectangle(0,0,width,height)),buffer,width,height)
                         } else super.onPaint(b,true,rects,buffer,width,height)
@@ -245,8 +245,8 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         closeBrowser();mirror.close();capacity=false
     }
     companion object {
-        const val WIDTH=960
-        const val HEIGHT=540
+        const val WIDTH=TelevisionStream.WIDTH
+        const val HEIGHT=TelevisionStream.HEIGHT
         private const val MAX_BROWSERS=2
         private var nextId=0
         private val active=Collections.newSetFromMap(IdentityHashMap<TelevisionBrowser,Boolean>())

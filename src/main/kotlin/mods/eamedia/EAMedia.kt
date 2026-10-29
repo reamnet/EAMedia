@@ -15,7 +15,8 @@ class EAMedia(bus: IEventBus) {
         bus.addListener<RegisterPayloadHandlersEvent> { event->
             // Required channel negotiation prevents mixing active media devices with a client
             // that only has ELN's inert placeholders or the old client-local TV protocol.
-            val registrar=event.registrar("4")
+            // Older relays impose a lower video budget and would silently drop 540p frames.
+            val registrar=event.registrar("5")
             registrar.playToClient(MediaPresence.TYPE,MediaPresence.CODEC) { _,_-> }
             registrar.playToServer(TelevisionCommand.TYPE,TelevisionCommand.CODEC) { packet,context->
                 context.enqueueWork { (context.player() as? net.minecraft.server.level.ServerPlayer)?.let { TelevisionNetwork.handle(it,packet) } }

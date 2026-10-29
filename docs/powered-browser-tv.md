@@ -1,6 +1,6 @@
 # Powered Browser Television
 
-EA Media 1.0.5 uses **client hosting by default**. One nearby player's client
+EA Media 1.0.6 uses **client hosting by default**. One nearby player's client
 runs the full interactive browser; everyone else receives its shared picture and
 audio. The server validates controls and relays bounded encoded packets. It does
 not launch Chromium, Xvfb or a video encoder in this mode. Every viewer sees the
@@ -8,9 +8,9 @@ same page, rather than opening an independent webpage.
 
 ## Install and hosting mode
 
-Update the server and every client to 1.0.5 together (required protocol 4).
-Use the full `EAMedia-1.0.5.jar` on clients. The Minecraft server can use the much
-smaller `EAMedia-1.0.5-server.jar` in the default client mode; install one variant.
+Update the server and every client to 1.0.6 together (required protocol 5).
+Use the full `EAMedia-1.0.6.jar` on clients. The Minecraft server can use the much
+smaller `EAMedia-1.0.6-server.jar` in the default client mode; install one variant.
 ELN 3.0.60+ remains supported and no core update is required.
 
 The first nearby observer hosts the TV. Taking control does not transfer hosting.
@@ -22,9 +22,10 @@ The host's browser profile belongs to that client. This is the tradeoff for
 keeping browser rendering and video decoding off the Minecraft server.
 
 The host displays its browser texture directly, with updates capped at 30 fps.
-Other viewers receive a 640×360 JPEG mirror capped at 20 fps, using lower JPEG
-quality when needed to fit the existing byte budget. This is a target/cap, not a
-promised frame rate; the host's CPU, network, page and client performance matter.
+Other viewers receive a full 960×540 JPEG mirror capped at 30 fps. JPEG quality
+starts at 0.65, with the 1.0.3 per-frame allowance of up to 131,072 bytes; it is
+reduced only if needed to fit that limit. There is no 360p downscaling.
+This is a target/cap, not a promised frame rate; the host's CPU, network, page and client performance matter.
 Conversion to Minecraft's pixel format runs off the render thread. Queues stay
 bounded and discard old frames rather than accumulating playback delay.
 
@@ -76,8 +77,10 @@ fixed blue input, 150 W while on and 2 W standby at nominal voltage. Power loss
 closes playback. Power return reloads and attempts ordinary media resume where
 the website allows it. Browser session, electrical and item IDs remain compatible.
 
-Approximate stream limits remain 800 kB/s JPEG and 120 kB/s audio per TV. The host
-uploads one stream, and server outgoing traffic scales with other viewers. This
+The video budget allows 3,932,160 bytes/s (about 31.5 Mbit/s) per TV at the
+maximum JPEG size and frame rate, plus up to 120 kB/s audio. Actual JPEG traffic
+depends on the page and is usually lower. The host uploads one stream, and
+server outgoing traffic scales with other viewers. This
 is a compressed screen mirror, rather than a direct original-quality video feed.
 Some websites prevent document audio capture. The pinned native capture callback
 is not used because that upstream implementation leaks native allocations.

@@ -13,6 +13,8 @@ data class TelevisionStream(val pos: BlockPos,val session: UUID,val epoch: UUID,
     override fun type()=TYPE
     companion object {
         const val VIDEO=0;const val AUDIO=1;const val CHUNK=24_000;const val MAX_FRAME=131_072;const val MAX_PARTS=6
+        const val WIDTH=960;const val HEIGHT=540;const val FPS=30
+        const val VIDEO_BYTES_PER_SECOND=MAX_FRAME*FPS
         val TYPE=CustomPacketPayload.Type<TelevisionStream>(ResourceLocation.fromNamespaceAndPath("eamedia","television_stream"))
         val CODEC: StreamCodec<RegistryFriendlyByteBuf,TelevisionStream> = StreamCodec.of({ b,p->
             b.writeBlockPos(p.pos);b.writeUUID(p.session);b.writeUUID(p.epoch);b.writeVarInt(p.revision);b.writeVarLong(p.sequence)
@@ -64,21 +66,22 @@ class TelevisionByteBudget(private val perSecond: Double,private val capacity: D
     }
 }
 
-class TelevisionRelay {
+class TelevisionRelay(private val clock: ()->Long={ System.nanoTime()/1_000_000 }) {
     private var key=""
-    var video=TelevisionFrameAssembler();private set
-    var videoBudget=TelevisionByteBudget(800_000.0,262_144.0);private set
+    private fun newVideoBudget()=TelevisionByteBudget(TelevisionStream.VIDEO_BYTES_PER_SECOND.toDouble(),TelevisionStream.MAX_FRAME*2.0,clock)
+    var video=TelevisionFrameAssembler(clock);private set
+    var videoBudget=newVideoBudget();private set
     var audioBudget=TelevisionByteBudget(120_000.0,24_576.0);private set
     val inputBudget=TelevisionByteBudget(120.0,120.0)
     var audioSequence=-1L
     var cached=emptyList<TelevisionStream>()
     fun drop() {
         if(key.isEmpty())return
-        key="";cached=emptyList();video=TelevisionFrameAssembler()
+        key="";cached=emptyList();video=TelevisionFrameAssembler(clock)
     }
     fun reset(session: UUID,epoch: UUID,revision: Int) {
         val next="$session/$epoch/$revision";if(next==key)return
-        key=next;video=TelevisionFrameAssembler();videoBudget=TelevisionByteBudget(800_000.0,262_144.0);audioBudget=TelevisionByteBudget(120_000.0,24_576.0)
+        key=next;video=TelevisionFrameAssembler(clock);videoBudget=newVideoBudget();audioBudget=TelevisionByteBudget(120_000.0,24_576.0)
         audioSequence=-1;cached=emptyList()
     }
 }

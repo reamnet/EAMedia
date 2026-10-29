@@ -1,6 +1,6 @@
 # Client-hosted TVs need no custom Docker image or Xvfb.
-# Put EAMedia-1.0.5-server.jar (or the full jar) in ./data/mods/.
-# Every client needs the full EAMedia-1.0.5.jar. Install one addon variant per side.
+# Put EAMedia-1.0.6-server.jar (or the full jar) in ./data/mods/.
+# Every client needs the full EAMedia-1.0.6.jar. Install one addon variant per side.
 services:
   minecraft:
     image: itzg/minecraft-server:java21
