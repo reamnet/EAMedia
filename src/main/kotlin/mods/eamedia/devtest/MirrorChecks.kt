@@ -81,6 +81,7 @@ object MirrorServerChecks {
                 return JsonObject().apply {
                     addProperty("url",tv.mediaUrl);addProperty("working",tv.working);addProperty("watts",tv.resistor.power);addProperty("revision",tv.mediaRevision)
                     addProperty("host",tv.sharedTv.host?.toString());addProperty("controller",tv.sharedTv.controller?.toString());addProperty("epoch",tv.sharedTv.hostEpoch.toString())
+                    add("serverBrowser",com.google.gson.Gson().toJsonTree(ServerTelevisions.diagnostic(tv)))
                     val sample=tv.sharedTv.snapshot();addProperty("position",sample.position);addProperty("paused",sample.paused)
                     val bytes=tv.mirrorRelay.cached.flatMap { it.bytes.asIterable() }.toByteArray();addProperty("imageHash",bytes.contentHashCode());addProperty("imageBytes",bytes.size)
                     if(java.lang.Boolean.getBoolean("eamedia.poleFixtures"))add("poles",JsonParser.parseString(Class.forName("mods.eln.devtest.PoleAttachmentChecks").getMethod("report").invoke(null).toString()))
@@ -121,6 +122,9 @@ object MirrorClientChecks {
                 }
                 "type"->c["text"].asString.forEach { (mc.screen as TelevisionScreen).charTyped(it,0) }
                 "close"->mc.screen?.onClose()
+                "sound-volume"->mc.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.RECORDS).set(c["value"].asDouble)
+                "sound-reset"->mc.soundManager.stop()
+                "sound-stall"->Thread.sleep(500)
                 "teleport"->mc.connection!!.sendCommand(c["command"].asString)
                 "page"->{ page="" }
                 "pole-open"->{
@@ -173,10 +177,14 @@ object MirrorClientChecks {
             if(c.has("working") && r.working!=c["working"].asBoolean)return null
             if(c.has("frames") && (if(tv.isHost)tv.mirror.encodedFrames else tv.mirror.receivedFrames)<c["frames"].asLong)return null
             if(c.has("audio") && tv.mirror.receivedAudioBytes<c["audio"].asLong)return null
+            if(c.has("playedAudio") && tv.mirror.playedAudioBytes<c["playedAudio"].asLong)return null
+            if(c.has("soundActive") && tv.mirror.soundActive!=c["soundActive"].asBoolean)return null
             if(c.has("hash") && tv.mirror.frameHash!=c["hash"].asInt)return null
             return JsonObject().apply {
                 addProperty("uuid",mc.player!!.uuid.toString());addProperty("host",tv.isHost);addProperty("browser",tv.browser!=null);addProperty("working",r.working);addProperty("url",r.mediaUrl)
                 addProperty("controller",tv.isController);addProperty("encodedFrames",tv.mirror.encodedFrames);addProperty("receivedFrames",tv.mirror.receivedFrames);addProperty("receivedAudioBytes",tv.mirror.receivedAudioBytes);addProperty("imageHash",tv.mirror.frameHash)
+                addProperty("playedAudioBytes",tv.mirror.playedAudioBytes);addProperty("soundActive",tv.mirror.soundActive);addProperty("playbackStarts",tv.mirror.playbackStarts);addProperty("serverStatus",r.tvServerStatus)
+                addProperty("channelResumes",tv.mirror.channelResumes)
             }
         }
         override fun photo(id: String) {

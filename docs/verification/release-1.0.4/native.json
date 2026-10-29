@@ -1,0 +1,1177 @@
+{
+  "platform": "Linux x64; private Xorg virtual display",
+  "audioDevice": "OpenAL Soft No Output; physical speakers not measured",
+  "runtimeCore": "3.0.63",
+  "compileCore": "3.0.60",
+  "campaignsPassed": [
+    "two-client controls/audio/disconnect/power",
+    "zero-viewer continuity",
+    "final deliberate mute and underrun recovery"
+  ],
+  "observations": {
+    "B-final-mute-records": {
+      "role": "B",
+      "id": "final-mute-records",
+      "action": "sound-volume",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 25,
+        "receivedAudioBytes": 2384640,
+        "imageHash": -690417468,
+        "playedAudioBytes": 111360,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 8
+      }
+    },
+    "server-final-power-off": {
+      "role": "server",
+      "id": "final-power-off",
+      "action": "power",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": false,
+        "watts": 0.0,
+        "revision": 1,
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "be050ad6-479c-4542-b5b5-9b884726a76e",
+        "serverBrowser": {
+          "status": "OFF",
+          "viewers": 1
+        },
+        "position": 0.8015,
+        "paused": false,
+        "imageHash": 1,
+        "imageBytes": 0
+      }
+    },
+    "B-final-open-control": {
+      "role": "B",
+      "id": "final-open-control",
+      "action": "open",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 8,
+        "receivedAudioBytes": 1290240,
+        "imageHash": -1914712920,
+        "playedAudioBytes": 199680,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 9
+      }
+    },
+    "B-final-return-audio": {
+      "role": "B",
+      "id": "final-return-audio",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 5,
+        "receivedAudioBytes": 167040,
+        "imageHash": -1764976896,
+        "playedAudioBytes": 115200,
+        "soundActive": true,
+        "playbackStarts": 4,
+        "serverStatus": "READY",
+        "channelResumes": 5
+      }
+    },
+    "server-final-playing": {
+      "role": "server",
+      "id": "final-playing",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99650395346418,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "controller": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "epoch": "be050ad6-479c-4542-b5b5-9b884726a76e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 166885,
+          "viewers": 1
+        },
+        "position": 4.6505,
+        "paused": false,
+        "imageHash": 1404914368,
+        "imageBytes": 33077
+      }
+    },
+    "B-final-distant-viewer-silent": {
+      "role": "B",
+      "id": "final-distant-viewer-silent",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": -934996057,
+        "playedAudioBytes": 0,
+        "soundActive": false,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 0
+      }
+    },
+    "B-final-boot": {
+      "role": "B",
+      "id": "final-boot",
+      "action": "boot",
+      "status": "passed",
+      "observation": {}
+    },
+    "B-final-after-stall": {
+      "role": "B",
+      "id": "final-after-stall",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 19,
+        "receivedAudioBytes": 2012160,
+        "imageHash": -1240789447,
+        "playedAudioBytes": 472320,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 28
+      }
+    },
+    "server-final-final": {
+      "role": "server",
+      "id": "final-final",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99649430717082,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 1
+        },
+        "position": 5.2735,
+        "paused": false,
+        "imageHash": 1158881896,
+        "imageBytes": 33742
+      }
+    },
+    "A-final-disconnect-first-viewer": {
+      "role": "A",
+      "id": "final-disconnect-first-viewer",
+      "action": "quit",
+      "status": "passed",
+      "observation": {}
+    },
+    "B-final-idle-open": {
+      "role": "B",
+      "id": "final-idle-open",
+      "action": "open",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 686,
+        "receivedAudioBytes": 16690560,
+        "imageHash": 599701797,
+        "playedAudioBytes": 12864000,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 587
+      }
+    },
+    "B-final-survives-disconnect": {
+      "role": "B",
+      "id": "final-survives-disconnect",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 65,
+        "receivedAudioBytes": 3719040,
+        "imageHash": 1866046807,
+        "playedAudioBytes": 897600,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 50
+      }
+    },
+    "B-final-sound-recovered": {
+      "role": "B",
+      "id": "final-sound-recovered",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 23,
+        "receivedAudioBytes": 2280960,
+        "imageHash": 1258027188,
+        "playedAudioBytes": 65280,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 4
+      }
+    },
+    "B-final-gatecheck-muted-second": {
+      "role": "B",
+      "id": "final-gatecheck-muted-second",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 19,
+        "receivedAudioBytes": 1301760,
+        "imageHash": -1855837161,
+        "playedAudioBytes": 209280,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 13
+      }
+    },
+    "B-final-before-stall": {
+      "role": "B",
+      "id": "final-before-stall",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 15,
+        "receivedAudioBytes": 1751040,
+        "imageHash": 103899241,
+        "playedAudioBytes": 384000,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 21
+      }
+    },
+    "B-final-idle-field": {
+      "role": "B",
+      "id": "final-idle-field",
+      "action": "click",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 689,
+        "receivedAudioBytes": 16778880,
+        "imageHash": -919713620,
+        "playedAudioBytes": 12925440,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 590
+      }
+    },
+    "B-final-click-button": {
+      "role": "B",
+      "id": "final-click-button",
+      "action": "click",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 13,
+        "receivedAudioBytes": 1639680,
+        "imageHash": -1445039718,
+        "playedAudioBytes": 337920,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 18
+      }
+    },
+    "B-final-gatecheck-unmute": {
+      "role": "B",
+      "id": "final-gatecheck-unmute",
+      "action": "sound-volume",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 21,
+        "receivedAudioBytes": 1384320,
+        "imageHash": -2070637989,
+        "playedAudioBytes": 14400,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 0
+      }
+    },
+    "A-final-boot": {
+      "role": "A",
+      "id": "final-boot",
+      "action": "boot",
+      "status": "passed",
+      "observation": {}
+    },
+    "B-final-off-client": {
+      "role": "B",
+      "id": "final-off-client",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": false,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": 1092184383,
+        "playedAudioBytes": 0,
+        "soundActive": false,
+        "playbackStarts": 2,
+        "serverStatus": "OFF",
+        "channelResumes": 0
+      }
+    },
+    "A-final-other-viewer-still-audible": {
+      "role": "A",
+      "id": "final-other-viewer-still-audible",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 48,
+        "receivedAudioBytes": 4665600,
+        "imageHash": -1390026983,
+        "playedAudioBytes": 991680,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 47
+      }
+    },
+    "B-final-gatecheck-initial-volume": {
+      "role": "B",
+      "id": "final-gatecheck-initial-volume",
+      "action": "sound-volume",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 3,
+        "receivedAudioBytes": 495360,
+        "imageHash": -902272987,
+        "playedAudioBytes": 71040,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 4
+      }
+    },
+    "server-final-after-viewer-disconnect": {
+      "role": "server",
+      "id": "final-after-viewer-disconnect",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99649430717082,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "be050ad6-479c-4542-b5b5-9b884726a76e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 166885,
+          "viewers": 1
+        },
+        "position": 7.0915,
+        "paused": false,
+        "imageHash": 668366863,
+        "imageBytes": 33907
+      }
+    },
+    "A-final-open": {
+      "role": "A",
+      "id": "final-open",
+      "action": "open",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": false,
+        "browser": false,
+        "working": false,
+        "url": "",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": 0,
+        "playedAudioBytes": 0,
+        "soundActive": false,
+        "playbackStarts": 0,
+        "serverStatus": "OFF",
+        "channelResumes": 0
+      }
+    },
+    "server-final-power-on": {
+      "role": "server",
+      "id": "final-power-on",
+      "action": "power",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99649430717082,
+        "revision": 1,
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "be050ad6-479c-4542-b5b5-9b884726a76e",
+        "serverBrowser": {
+          "status": "OFF",
+          "viewers": 0
+        },
+        "position": 0.9125,
+        "paused": false,
+        "imageHash": 1,
+        "imageBytes": 0
+      }
+    },
+    "A-final-join": {
+      "role": "A",
+      "id": "final-join",
+      "action": "join",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "integrated": false
+      }
+    },
+    "B-final-server-audio-b": {
+      "role": "B",
+      "id": "final-server-audio-b",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 6,
+        "receivedAudioBytes": 1178880,
+        "imageHash": 2128367546,
+        "playedAudioBytes": 153600,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 6
+      }
+    },
+    "B-final-gatecheck-mute": {
+      "role": "B",
+      "id": "final-gatecheck-mute",
+      "action": "sound-volume",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 10,
+        "receivedAudioBytes": 910080,
+        "imageHash": 1238705867,
+        "playedAudioBytes": 209280,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 13
+      }
+    },
+    "B-final-volume-recovered": {
+      "role": "B",
+      "id": "final-volume-recovered",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 34,
+        "receivedAudioBytes": 2833920,
+        "imageHash": -1996589116,
+        "playedAudioBytes": 303360,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 19
+      }
+    },
+    "B-final-local-sound-stop": {
+      "role": "B",
+      "id": "final-local-sound-stop",
+      "action": "sound-reset",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 21,
+        "receivedAudioBytes": 2160000,
+        "imageHash": 948076017,
+        "playedAudioBytes": 19200,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 1
+      }
+    },
+    "B-final-gatecheck-boot": {
+      "role": "B",
+      "id": "final-gatecheck-boot",
+      "action": "boot",
+      "status": "passed",
+      "observation": {}
+    },
+    "A-final-go": {
+      "role": "A",
+      "id": "final-go",
+      "action": "go",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 0,
+        "imageHash": 0,
+        "playedAudioBytes": 0,
+        "soundActive": false,
+        "playbackStarts": 0,
+        "serverStatus": "OFF",
+        "channelResumes": 0
+      }
+    },
+    "B-final-type-input": {
+      "role": "B",
+      "id": "final-type-input",
+      "action": "type",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 11,
+        "receivedAudioBytes": 1545600,
+        "imageHash": -358391403,
+        "playedAudioBytes": 291840,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 15
+      }
+    },
+    "server-final-idle-before-empty": {
+      "role": "server",
+      "id": "final-idle-before-empty",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99647490545834,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 1
+        },
+        "position": 11.3145,
+        "paused": false,
+        "imageHash": -1351656055,
+        "imageBytes": 35982
+      }
+    },
+    "B-final-click-input": {
+      "role": "B",
+      "id": "final-click-input",
+      "action": "click",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 9,
+        "receivedAudioBytes": 1418880,
+        "imageHash": 1076410063,
+        "playedAudioBytes": 245760,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 12
+      }
+    },
+    "B-final-join": {
+      "role": "B",
+      "id": "final-join",
+      "action": "join",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "integrated": false
+      }
+    },
+    "B-final-on-audio": {
+      "role": "B",
+      "id": "final-on-audio",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 5,
+        "receivedAudioBytes": 69120,
+        "imageHash": 2044787226,
+        "playedAudioBytes": 53760,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 2
+      }
+    },
+    "B-final-unmute-records": {
+      "role": "B",
+      "id": "final-unmute-records",
+      "action": "sound-volume",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 32,
+        "receivedAudioBytes": 2707200,
+        "imageHash": 621398679,
+        "playedAudioBytes": 257280,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 16
+      }
+    },
+    "B-final-leave-viewing-range": {
+      "role": "B",
+      "id": "final-leave-viewing-range",
+      "action": "teleport",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 695,
+        "receivedAudioBytes": 16995840,
+        "imageHash": -934996057,
+        "playedAudioBytes": 13033920,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 596
+      }
+    },
+    "B-final-gatecheck-restored": {
+      "role": "B",
+      "id": "final-gatecheck-restored",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 23,
+        "receivedAudioBytes": 1461120,
+        "imageHash": 838269980,
+        "playedAudioBytes": 61440,
+        "soundActive": true,
+        "playbackStarts": 2,
+        "serverStatus": "READY",
+        "channelResumes": 3
+      }
+    },
+    "server-final-no-viewers": {
+      "role": "server",
+      "id": "final-no-viewers",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99647490545834,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 0
+        },
+        "position": 6.374121000000001,
+        "paused": false,
+        "imageHash": 1541105204,
+        "imageBytes": 35425
+      }
+    },
+    "A-final-server-audio-a": {
+      "role": "A",
+      "id": "final-server-audio-a",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 5,
+        "receivedAudioBytes": 397440,
+        "imageHash": -394395022,
+        "playedAudioBytes": 85440,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 3
+      }
+    },
+    "B-final-gatecheck-stall": {
+      "role": "B",
+      "id": "final-gatecheck-stall",
+      "action": "sound-stall",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 6,
+        "receivedAudioBytes": 748800,
+        "imageHash": -588463633,
+        "playedAudioBytes": 140160,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 10
+      }
+    },
+    "B-final-finish-close": {
+      "role": "B",
+      "id": "final-finish-close",
+      "action": "close",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 10,
+        "receivedAudioBytes": 195840,
+        "imageHash": 163888470,
+        "playedAudioBytes": 153600,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 7
+      }
+    },
+    "B-final-gatecheck-join": {
+      "role": "B",
+      "id": "final-gatecheck-join",
+      "action": "join",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "integrated": false
+      }
+    },
+    "B-final-idle-type": {
+      "role": "B",
+      "id": "final-idle-type",
+      "action": "type",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 692,
+        "receivedAudioBytes": 16894080,
+        "imageHash": 1522095690,
+        "playedAudioBytes": 12986880,
+        "soundActive": true,
+        "playbackStarts": 3,
+        "serverStatus": "READY",
+        "channelResumes": 593
+      }
+    },
+    "server-final-after-power-return": {
+      "role": "server",
+      "id": "final-after-power-return",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99649430717082,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "controller": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 1
+        },
+        "position": 4.335500000000001,
+        "paused": false,
+        "imageHash": 1106113021,
+        "imageBytes": 32040
+      }
+    },
+    "B-final-gatecheck-playing": {
+      "role": "B",
+      "id": "final-gatecheck-playing",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 5,
+        "receivedAudioBytes": 629760,
+        "imageHash": -2048933990,
+        "playedAudioBytes": 120960,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 7
+      }
+    },
+    "server-final-same-browser-after-return": {
+      "role": "server",
+      "id": "final-same-browser-after-return",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99647246990597,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 1
+        },
+        "position": 10.9135,
+        "paused": false,
+        "imageHash": -1394406858,
+        "imageBytes": 35330
+      }
+    },
+    "B-final-gatecheck-muted-first": {
+      "role": "B",
+      "id": "final-gatecheck-muted-first",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 12,
+        "receivedAudioBytes": 1017600,
+        "imageHash": -1665473289,
+        "playedAudioBytes": 209280,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 13
+      }
+    },
+    "B-final-return-viewing-range": {
+      "role": "B",
+      "id": "final-return-viewing-range",
+      "action": "teleport",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 0,
+        "receivedAudioBytes": 19200,
+        "imageHash": -934996057,
+        "playedAudioBytes": 19200,
+        "soundActive": true,
+        "playbackStarts": 4,
+        "serverStatus": "READY",
+        "channelResumes": 0
+      }
+    },
+    "B-final-stall-client": {
+      "role": "B",
+      "id": "final-stall-client",
+      "action": "sound-stall",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": true,
+        "encodedFrames": 0,
+        "receivedFrames": 17,
+        "receivedAudioBytes": 1898880,
+        "imageHash": -1103267633,
+        "playedAudioBytes": 430080,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 25
+      }
+    },
+    "server-final-before-empty-viewers": {
+      "role": "server",
+      "id": "final-before-empty-viewers",
+      "action": "state",
+      "status": "passed",
+      "observation": {
+        "url": "http://127.0.0.1:8765/index.html",
+        "working": true,
+        "watts": 149.99647733678242,
+        "revision": 1,
+        "host": "00000000-0000-0000-0000-000000000001",
+        "epoch": "58b15833-6ddf-4cd1-b670-ba7f2c70b36e",
+        "serverBrowser": {
+          "status": "READY",
+          "workerPid": 167650,
+          "viewers": 1
+        },
+        "position": 10.225775,
+        "paused": false,
+        "imageHash": -106079985,
+        "imageBytes": 33129
+      }
+    },
+    "A-final-host-close": {
+      "role": "A",
+      "id": "final-host-close",
+      "action": "close",
+      "status": "passed",
+      "observation": {
+        "uuid": "0d0f73f5-8584-31cc-9d5f-8e30e864e1ce",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 7,
+        "receivedAudioBytes": 629760,
+        "imageHash": -1194550436,
+        "playedAudioBytes": 131520,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 6
+      }
+    },
+    "B-final-gatecheck-resumed": {
+      "role": "B",
+      "id": "final-gatecheck-resumed",
+      "action": "watch",
+      "status": "passed",
+      "observation": {
+        "uuid": "5bdcfb47-0b99-3f35-8c47-66e5f36b9087",
+        "host": false,
+        "browser": false,
+        "working": true,
+        "url": "http://127.0.0.1:8765/index.html",
+        "controller": false,
+        "encodedFrames": 0,
+        "receivedFrames": 8,
+        "receivedAudioBytes": 837120,
+        "imageHash": 731279235,
+        "playedAudioBytes": 182400,
+        "soundActive": true,
+        "playbackStarts": 1,
+        "serverStatus": "READY",
+        "channelResumes": 13
+      }
+    }
+  }
+}

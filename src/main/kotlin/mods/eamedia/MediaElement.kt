@@ -18,7 +18,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import kotlin.math.abs
 
-/** Passive electrical device. Media I/O is entirely in the addon's client renderer. */
+/** Passive electrical device; TV I/O uses a server worker, jukebox playback uses clients. */
 class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor): TransparentNodeElement(node,descriptor),CordDevice,RemoteSwitchableDevice,StandaloneDeviceControls {
     val kind=(descriptor as MediaDescriptor).kind
     var settings=kind.defaults;private set
@@ -31,6 +31,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     var lifetimeJoules=0.0;private set
     val sharedTv=SharedTelevision()
     val mirrorRelay=TelevisionRelay()
+    var tvServerStatus="OFF"
     private val history=ArrayList<String>()
     private var historyIndex=-1
     private var legacy=CompoundTag()
@@ -85,8 +86,13 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         prepare();needPublish();return true
     }
     internal fun navigateHistory(action: Int) {
-        val next=when(action) { TelevisionCommand.BACK->historyIndex-1;TelevisionCommand.FORWARD->historyIndex+1;else->historyIndex }
-        if(next in history.indices) { historyIndex=next;playMedia(history[next],false) }
+        ServerTelevisions.navigate(this,action)
+    }
+    internal fun browserPageChanged(url: String) {
+        if(mediaUrl==url)return
+        mediaUrl=url
+        if(history.getOrNull(historyIndex)!=url){while(history.size>historyIndex+1)history.removeAt(history.lastIndex);history.add(url);if(history.size>32)history.removeAt(0);historyIndex=history.lastIndex}
+        needPublish()
     }
     fun stopMedia() { mediaRequested=false;prepare();needPublish() }
     override fun getElectricalLoad(side: Direction,lrdu: LRDU)=when {
@@ -138,6 +144,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
             out.writeUTF(sharedTv.host?.toString() ?: "");out.writeUTF(sharedTv.hostEpoch.toString())
             val s=sharedTv.snapshot();out.writeDouble(s.position);out.writeBoolean(s.paused);out.writeDouble(s.rate);out.writeDouble(s.duration);out.writeBoolean(s.live);out.writeBoolean(s.known)
             out.writeBoolean(historyIndex>0);out.writeBoolean(historyIndex>=0 && historyIndex<history.lastIndex)
+            out.writeUTF(tvServerStatus)
         }
     }
     override fun networkUnserialize(input: DataInputStream): Byte {

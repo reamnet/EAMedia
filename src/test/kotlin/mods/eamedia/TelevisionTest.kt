@@ -41,36 +41,14 @@ class TelevisionTest {
         assertEquals(9,MediaKind.JUKEBOX.reserved.subId);assertEquals(8,mods.eln.transparentnode.industrial.IndustrialKind.WELDER.ordinal);assertEquals(10,MediaKind.TV.reserved.subId)
         assertFalse(MediaKind.TV.valid(doubleArrayOf(480.0,.5)));assertFalse(MediaKind.TV.valid(doubleArrayOf(120.0,1.1)))
     }
-    @Test fun browserVolumePreservesPageMuteAndLocalVolumeAndAlsoControlsWebAudio() {
-        val script="""
-            globalThis.window=globalThis;
-            class AudioNode { connect(destination){this.destination=destination;return destination} }
-            class AudioDestinationNode extends AudioNode {}
-            globalThis.AudioNode=AudioNode;globalThis.AudioDestinationNode=AudioDestinationNode;
-            globalThis.WeakRef=class {constructor(value){this.value=value}deref(){return this.value}};
-            const media={volume:1,muted:true};
-            globalThis.document={querySelectorAll:()=>[media],addEventListener:()=>{}};
-            globalThis.setInterval=()=>{};
-            function equal(a,b){if(Math.abs(a-b)>.00001)throw Error(a+' != '+b)}
-            ${TelevisionBrowser.volumeScript(.5)}
-            equal(media.volume,.5);if(!media.muted)throw Error('Page mute was overwritten');
-            const destination=new AudioDestinationNode();destination.context={createGain:()=>Object.assign(new AudioNode(),{gain:{value:1}})};
-            const source=new AudioNode();source.connect(destination);equal(source.destination.gain.value,.5);
-            ${TelevisionBrowser.volumeScript(.8)}
-            equal(media.volume,.8);equal(source.destination.gain.value,.8);
-            media.volume=.4;
-            ${TelevisionBrowser.volumeScript(.5)}
-            equal(media.volume,.2);
-            ${TelevisionBrowser.volumeScript(Double.NaN)}
-            equal(media.volume,0);equal(source.destination.gain.value,0);
-            console.log('TV volume checks passed');
-        """.trimIndent()
-        val file=temp.root.toPath().resolve("volume-test.js");Files.writeString(file,script)
-        val exe=BundledMediaRuntime(temp.root.toPath().resolve("runtime")).resolve("quickjs")
-        val process=ProcessBuilder(exe.toString(),file.toString()).redirectErrorStream(true).start()
-        try {
-            assertTrue(process.waitFor(15,TimeUnit.SECONDS));val output=process.inputStream.bufferedReader().readText()
-            assertEquals(0,process.exitValue(),output);assertTrue(output.contains("TV volume checks passed"))
-        } finally { process.destroyForcibly() }
+    @Test fun viewerGainIsLocalAndClampsInvalidOrOutOfRangeInputs() {
+        assertEquals(.5,televisionGain(.5,0.0),1e-12)
+        assertEquals(.25,televisionGain(.5,256.0),1e-12)
+        assertEquals(0.0,televisionGain(1.0,1024.0),1e-12)
+        assertEquals(0.0,televisionGain(Double.NaN,0.0))
+        assertEquals(0.0,televisionGain(1.0,Double.POSITIVE_INFINITY))
+        assertEquals(0.0,televisionGain(1.0,-1.0))
+        assertEquals(1.0,televisionGain(2.0,0.0))
+        assertEquals(0.0,televisionGain(-1.0,0.0))
     }
 }

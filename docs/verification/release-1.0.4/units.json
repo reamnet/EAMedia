@@ -1,0 +1,9 @@
+{
+  "command": "./gradlew --no-daemon --max-workers=2 compileKotlin --rerun compileJava --rerun build -PelnJar=/workspace/ELN1.21.1ForkPatch/build/libs/ElectricalAge-3.0.60.jar",
+  "result": "BUILD SUCCESSFUL",
+  "suites": 8,
+  "tests": 33,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+}

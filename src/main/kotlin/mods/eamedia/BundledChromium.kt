@@ -16,7 +16,7 @@ import java.util.UUID
 import java.util.zip.GZIPInputStream
 
 /** The native browser comes exclusively from the addon jar. No installer network requests. */
-class BundledChromium(private val cache: Path,private val resource: (String)->InputStream? = { BundledChromium::class.java.getResourceAsStream("/assets/eamedia/chromium/$it") }) {
+class BundledChromium(private val cache: Path,private val serverTar: Boolean=false,private val resource: (String)->InputStream? = { BundledChromium::class.java.getResourceAsStream("/assets/eamedia/chromium/$it") }) {
     private val manifest by lazy { checkNotNull(resource("manifest.json")) { "Bundled Chromium manifest missing" }.bufferedReader().use { JsonParser.parseReader(it).asJsonObject }.also { require(it["schema"].asInt==1) } }
     internal val revision get()=manifest["jcefCommit"].asString
     fun install(platform: String): Path=synchronized(lock) {
@@ -75,6 +75,19 @@ class BundledChromium(private val cache: Path,private val resource: (String)->In
     private data class Link(val path: Path,val target: String,val hard: Boolean)
     private fun extract(archive: Path,root: Path,platform: String,maxBytes: Long) {
         require(maxBytes in 1..MAX_UNPACKED)
+        if(serverTar) {
+            // Dedicated Minecraft lacks the client's Commons Compress library. This archive
+            // has already passed the pinned manifest's complete SHA-256/size verification.
+            // Use the OS tar in the staging directory; install() still verifies every native
+            // file and resolved link before committing anything to the runtime directory.
+            val log=root.resolve("extract.log")
+            val process=ProcessBuilder("tar","-xzf",archive.toString(),"-C",root.toString()).redirectErrorStream(true).redirectOutput(log.toFile()).start()
+            try {
+                if(!process.waitFor(120,java.util.concurrent.TimeUnit.SECONDS)){process.destroyForcibly();throw IOException("Server Chromium extraction timed out")}
+                if(process.exitValue()!=0)throw IOException("Server Chromium extraction failed: "+Files.readString(log).take(2048))
+            }finally{if(process.isAlive)process.destroyForcibly()}
+            return
+        }
         val selected=root.resolve(platform);val links=ArrayList<Link>();var total=0L
         TarArchiveInputStream(GZIPInputStream(Files.newInputStream(archive))).use { tar->
             while(true) {

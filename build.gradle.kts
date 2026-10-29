@@ -57,8 +57,8 @@ tasks.processResources {
     filesMatching("META-INF/neoforge.mods.toml") { expand(mapOf("version" to project.version.toString())) }
 }
 tasks.named<Test>("test") { useJUnitPlatform() }
-// Dedicated servers only need device logic, save IDs and the required channel handshake.
-// They never execute or extract the client media tools or Chromium.
+// Small variant for jukebox-only servers. TV-hosting servers require the full jar
+// because their isolated browser workers extract the bundled Chromium payload.
 val serverJar by tasks.registering(Jar::class) {
     archiveClassifier.set("server")
     dependsOn(tasks.named("jar"))

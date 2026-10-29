@@ -13,36 +13,35 @@ import kotlin.test.*
 
 class SharedTelevisionTest {
     private val a=UUID(1,1);private val b=UUID(2,2);private val c=UUID(3,3)
-    @Test fun onlyOneBrowserHostExistsWhileAnotherPlayerCanControlItsPicture() {
-        var now=0L;val tv=SharedTelevision { now }
-        assertTrue(tv.claim(a,false));val epoch=tv.hostEpoch
-        assertTrue(tv.claim(b,false));assertEquals(a,tv.host)
-        assertTrue(tv.claim(b,true));assertEquals(b,tv.controller);assertEquals(a,tv.host)
-        assertFalse(tv.claim(c,true));tv.release(b);assertTrue(tv.claim(c,true))
-        assertEquals(setOf(a,b),tv.activeViewers)
-        now=6001;assertNull(tv.host);assertNull(tv.controller);assertTrue(tv.activeViewers.isEmpty())
-        assertTrue(tv.claim(b,false));assertEquals(b,tv.host);assertNotEquals(epoch,tv.hostEpoch)
+    @Test fun serverHostNeverMovesWhenControllersOrViewersLeave() {
+        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();val epoch=tv.hostEpoch
+        assertTrue(tv.claim(a,false));assertTrue(tv.claim(b,false));assertEquals(SharedTelevision.SERVER_HOST,tv.host)
+        assertTrue(tv.claim(b,true));assertEquals(b,tv.controller);assertFalse(tv.claim(c,true))
+        tv.leave(b);assertTrue(tv.claim(c,true));assertEquals(SharedTelevision.SERVER_HOST,tv.host);assertEquals(epoch,tv.hostEpoch)
+        now=6001;assertNull(tv.controller);assertTrue(tv.activeViewers.isEmpty());assertEquals(SharedTelevision.SERVER_HOST,tv.host)
+        tv.claim(a,false);assertEquals(epoch,tv.hostEpoch)
+        tv.stopServerHost();assertNull(tv.host);tv.startServerHost();assertNotEquals(epoch,tv.hostEpoch)
     }
     @Test fun playbackClockIsSharedPowerAwareAndNotAdvancedWhileUnloaded() {
-        var now=0L;val tv=SharedTelevision { now };tv.claim(a,false);tv.running(true)
-        assertTrue(tv.report(a,TelevisionPlayback(12.0,false,1.0,100.0,false,true),1))
+        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false);tv.running(true)
+        assertTrue(tv.report(SharedTelevision.SERVER_HOST,TelevisionPlayback(12.0,false,1.0,100.0,false,true),1))
         now=2000;assertEquals(14.0,tv.snapshot().position)
         tv.running(false);now=10_000;assertEquals(14.0,tv.snapshot().position)
         tv.running(true);now=11_000;assertEquals(15.0,tv.snapshot().position)
-        tv.claim(a,false);assertTrue(tv.report(a,TelevisionPlayback(15.0,true,1.0,100.0,false,true),2))
+        tv.claim(a,false);assertTrue(tv.report(SharedTelevision.SERVER_HOST,TelevisionPlayback(15.0,true,1.0,100.0,false,true),2))
         now=12_000;assertEquals(15.0,tv.snapshot().position)
     }
     @Test fun staleOrUntrustedPlaybackReportsCannotReplaceHostState() {
-        var now=0L;val tv=SharedTelevision { now };tv.claim(a,false)
+        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false)
         val s=TelevisionPlayback(8.0,false,1.0,20.0,false,true)
-        assertFalse(tv.report(b,s,1));assertFalse(tv.report(a,s.copy(position=Double.NaN),1))
-        assertTrue(tv.report(a,s,1));assertFalse(tv.report(a,s.copy(position=9.0),2))
-        now=500;assertFalse(tv.report(a,s,1));assertTrue(tv.report(a,s.copy(position=9.0),2))
-        now=7000;tv.claim(b,false);assertFalse(tv.report(a,s,3));assertTrue(tv.report(b,s,1))
+        assertFalse(tv.report(b,s,1));assertFalse(tv.report(SharedTelevision.SERVER_HOST,s.copy(position=Double.NaN),1))
+        assertTrue(tv.report(SharedTelevision.SERVER_HOST,s,1));assertFalse(tv.report(SharedTelevision.SERVER_HOST,s.copy(position=9.0),2))
+        now=500;assertFalse(tv.report(SharedTelevision.SERVER_HOST,s,1));assertTrue(tv.report(SharedTelevision.SERVER_HOST,s.copy(position=9.0),2))
+        now=7000;tv.claim(b,false);assertFalse(tv.report(a,s,3));tv.stopServerHost();tv.startServerHost();assertTrue(tv.report(SharedTelevision.SERVER_HOST,s,1))
     }
     @Test fun restartRetainsResumePositionButNeverAnOldHostOrControlLease() {
-        var now=0L;val tv=SharedTelevision { now };tv.claim(a,false);tv.claim(b,true);tv.running(true)
-        tv.report(a,TelevisionPlayback(30.0,false,1.5,100.0,false,true),1);now=2000
+        var now=0L;val tv=SharedTelevision { now };tv.startServerHost();tv.claim(a,false);tv.claim(b,true);tv.running(true)
+        tv.report(SharedTelevision.SERVER_HOST,TelevisionPlayback(30.0,false,1.5,100.0,false,true),1);now=2000
         val tag=CompoundTag().also(tv::write);val copy=SharedTelevision { now+86_400_000 }.apply { read(tag) }
         assertEquals(33.0,copy.snapshot().position);assertNull(copy.host);assertNull(copy.controller);assertNotEquals(tv.session,copy.session)
         tag.getCompound("televisionPlayback").putDouble("position",Double.POSITIVE_INFINITY);copy.read(tag);assertFalse(copy.snapshot().known)
@@ -86,9 +85,9 @@ class SharedTelevisionTest {
     }
     @Test fun jpegDecoderChecksDimensionsAndFormatBeforeReadingPixels() {
         val image=BufferedImage(960,540,BufferedImage.TYPE_INT_RGB);image.setRGB(400,200,0xffcc2200.toInt())
-        val encoded=TelevisionMirror.jpeg(image);assertTrue(encoded.size<TelevisionStream.MAX_FRAME)
+        val encoded=mods.eamedia.server.BrowserWorker.jpeg(image,.65f);assertTrue(encoded.size<TelevisionStream.MAX_FRAME)
         val copy=TelevisionMirror.decode(encoded);assertEquals(960,copy.width);assertEquals(540,copy.height)
-        assertThrows(IllegalArgumentException::class.java) { TelevisionMirror.decode(TelevisionMirror.jpeg(BufferedImage(961,540,BufferedImage.TYPE_INT_RGB))) }
+        assertThrows(IllegalArgumentException::class.java) { TelevisionMirror.decode(mods.eamedia.server.BrowserWorker.jpeg(BufferedImage(961,540,BufferedImage.TYPE_INT_RGB),.65f)) }
         assertThrows(IllegalArgumentException::class.java) { TelevisionMirror.decode(ByteArray(TelevisionStream.MAX_FRAME+1)) }
     }
     @Test fun remoteInputAcceptsOnlyBrowserEventsAndBoundedCoordinates() {
@@ -102,7 +101,7 @@ class SharedTelevisionTest {
     @Test fun pcmQueueDropsOldBacklogAndReturnsSmallAlignedAudioBuffers() {
         val queue=TelevisionPcmQueue();assertEquals(2,queue.format.channels);assertEquals(24000f,queue.format.sampleRate)
         queue.offer(ByteArray(8192) { 1 });queue.offer(ByteArray(8192) { 2 });queue.offer(ByteArray(8192) { 3 })
-        val data=queue.read(65_536);assertEquals(1920,data.remaining());assertEquals(2.toByte(),data.get())
+        val data=queue.read(65_536);assertEquals(4800,data.remaining());assertEquals(2.toByte(),data.get())
         queue.close();assertEquals(0,queue.read(1920).remaining())
     }
 }

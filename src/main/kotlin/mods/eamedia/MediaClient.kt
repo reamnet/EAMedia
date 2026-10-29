@@ -52,6 +52,7 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
     var tvSession: java.util.UUID?=null;var tvController: java.util.UUID?=null;var tvInteractive=false
     var tvHost: java.util.UUID?=null;var tvHostEpoch=java.util.UUID(0,0)
     var tvPlayback=TelevisionPlayback();var tvSampleNanos=0L;var tvBack=false;var tvForward=false
+    var tvServerStatus="OFF"
     val webAudio by lazy { WebJukeboxAudio(this,tileEntity) }
     val television by lazy { TelevisionBrowser(this) }
     override fun refresh(deltaT: Float) { super.refresh(deltaT);if(kind==MediaKind.TV)television.update() else webAudio.update() }
@@ -68,6 +69,7 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
             tvHost=input.readUTF().takeIf { it.isNotBlank() }?.let(java.util.UUID::fromString);tvHostEpoch=java.util.UUID.fromString(input.readUTF())
             tvPlayback=TelevisionPlayback(input.readDouble(),input.readBoolean(),input.readDouble(),input.readDouble(),input.readBoolean(),input.readBoolean());tvSampleNanos=System.nanoTime()
             tvBack=input.readBoolean();tvForward=input.readBoolean()
+            tvServerStatus=input.readUTF()
         }
     }
     override fun newGuiDraw(side: Direction,player: Player)=if(kind==MediaKind.TV)TelevisionScreen(this) else JukeboxScreen(this)

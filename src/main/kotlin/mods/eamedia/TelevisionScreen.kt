@@ -93,7 +93,7 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
             address.isFocused=false;pageFocus=true;tv.focused=true;pressed.add(button)
             tv.sendInput("down","x" to bx(x),"y" to by(y),"button" to button);return true
         }
-        pageFocus=false;tv.focused=false;tv.browser?.setFocus(false)
+        pageFocus=false;tv.focused=false
         return super.mouseClicked(x,y,button)
     }
     override fun mouseReleased(x: Double,y: Double,button: Int): Boolean {
@@ -115,7 +115,7 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
     }
     override fun keyPressed(key: Int,scan: Int,mods: Int): Boolean {
         if(key==GLFW.GLFW_KEY_ESCAPE) { onClose();return true }
-        if(key==GLFW.GLFW_KEY_L && hasControlDown()) { pageFocus=false;tv.focused=false;address.isFocused=true;tv.browser?.setFocus(false);address.setCursorPosition(address.value.length);address.setHighlightPos(0);return true }
+        if(key==GLFW.GLFW_KEY_L && hasControlDown()) { pageFocus=false;tv.focused=false;address.isFocused=true;address.setCursorPosition(address.value.length);address.setHighlightPos(0);return true }
         if(address.isFocused && (key==GLFW.GLFW_KEY_ENTER || key==GLFW.GLFW_KEY_KP_ENTER)) { navigate();return true }
         if(pageFocus && tv.isController && key==GLFW.GLFW_KEY_V && hasControlDown()) {
             minecraft!!.keyboardHandler.clipboard.take(4096).chunked(256).forEach { tv.sendInput("paste","text" to it) };return true
@@ -134,7 +134,7 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
     override fun removed() {
         pressed.forEach { tv.sendInput("up","x" to 0,"y" to 0,"button" to it) };pressed.clear()
         tv.command(TelevisionCommand.RELEASE)
-        tv.focused=false;tv.browser?.setFocus(false);GLFW.glfwSetCursor(minecraft!!.window.window,0)
+        tv.focused=false;GLFW.glfwSetCursor(minecraft!!.window.window,0)
     }
     override fun onClose() { super.onClose() }
 }

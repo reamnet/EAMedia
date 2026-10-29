@@ -5,7 +5,7 @@
     const send = value => {
         try { window.eaTvCapture({request: value, onSuccess: () => {}, onFailure: () => {}}); } catch (_) {}
     };
-    const attached = new WeakSet(), inGraph = new WeakSet(), buses = new WeakMap();
+    const attached = new WeakSet(), inGraph = new WeakSet(), buses = new WeakMap(), elementGains = new WeakMap();
     let context, processor;
     const audio = () => {
         if (context) return context;
@@ -29,11 +29,29 @@
         context.resume().catch(() => {});
         return context;
     };
-    const stream = mediaStream => {
+    const stream = (mediaStream, media) => {
         const tracks = mediaStream.getAudioTracks();
         if (!tracks.length) return false;
         const c = audio(), source = c.createMediaStreamSource(new MediaStream(tracks));
-        source.connect(processor); return true;
+        if (media) {
+            // captureStream ignores the element's speaker volume/mute. Apply the page's
+            // own controls here; individual Minecraft volume is applied only by viewers.
+            const gain = c.createGain();
+            gain.gain.value = media.muted ? 0 : media.volume;
+            elementGains.set(media, gain);source.connect(gain);gain.connect(processor);
+            let detached = false;
+            const detach = () => {
+                if (detached) return;
+                detached = true;source.disconnect();gain.disconnect();
+                if (elementGains.get(media) === gain) { elementGains.delete(media);attached.delete(media); }
+            };
+            // A playlist/SPA may reuse its video element with a new audio track.
+            // Reattach that source instead of leaving its ended stream marked attached.
+            tracks.forEach(track => track.addEventListener?.('ended', detach, {once: true}));
+            mediaStream.addEventListener?.('addtrack', event => { if (!tracks.includes(event.track)) detach(); });
+            mediaStream.addEventListener?.('removetrack', event => { if (tracks.includes(event.track)) detach(); });
+        } else source.connect(processor);
+        return true;
     };
     // Web Audio output is tapped before the TV's local distance/master gain.
     const connect = AudioNode.prototype.connect;
@@ -57,8 +75,10 @@
         const media = Array.from(document.querySelectorAll('video,audio'));
         media.forEach(m => {
             if (!attached.has(m) && !inGraph.has(m) && m.readyState >= 2 && typeof m.captureStream === 'function') {
-                try { if (stream(m.captureStream())) attached.add(m); } catch (_) {}
+                try { if (stream(m.captureStream(), m)) attached.add(m); } catch (_) {}
             }
+            const gain = elementGains.get(m);
+            if (gain) gain.gain.value = m.muted ? 0 : m.volume;
             const resume = window.__eaTVResume;
             if (!resumed.has(m) && m.readyState >= 1) {
                 resumed.add(m);
@@ -83,5 +103,6 @@
     };
     document.addEventListener('play', () => { audio().resume().catch(() => {}); update(); }, true);
     document.addEventListener('loadedmetadata', update, true);
+    document.addEventListener('volumechange', update, true);
     setInterval(update, 500); update();
 })();

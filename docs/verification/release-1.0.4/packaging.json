@@ -1,0 +1,25 @@
+{
+  "packages": [
+    {
+      "jar": "EAMedia-1.0.4.jar",
+      "bytes": 764585894,
+      "sha256": "79f6cf9a9b0b11e86af70aea77c4382c3eb3d1105a960f2f97afbc18164061de",
+      "version": "1.0.4",
+      "chromiumPayload": true,
+      "serverBrowserClasses": true,
+      "doesNotShadowClientGlfw": true
+    },
+    {
+      "jar": "EAMedia-1.0.4-server.jar",
+      "bytes": 503518,
+      "sha256": "528dd7dd674daf60bbe918095cbe84725928087b910ce8908195bf0bc3ab623f",
+      "version": "1.0.4",
+      "chromiumPayload": false,
+      "serverBrowserClasses": true,
+      "doesNotShadowClientGlfw": true
+    }
+  ],
+  "isolatedWorkerHasInputCompatibilityTable": true,
+  "gradleDependenciesAndWrapperUnchanged": true,
+  "nativePayloadsUnchanged": true
+}
