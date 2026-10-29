@@ -1,0 +1,115 @@
+{
+  "tests": 56,
+  "suites": [
+    {
+      "name": "mods.eamedia.SharedTelevisionTest",
+      "tests": "10",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:02.048Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.088"
+    },
+    {
+      "name": "mods.eamedia.web.WebRoutingTest",
+      "tests": "12",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:02.272Z",
+      "hostname": "6925a30a6f6e",
+      "time": "2.599"
+    },
+    {
+      "name": "mods.eamedia.WebJukeboxTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:02.243Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.027"
+    },
+    {
+      "name": "mods.eamedia.ServerTelevisionTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:01.927Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.119"
+    },
+    {
+      "name": "mods.eamedia.BundledMediaRuntimeTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:33:55.567Z",
+      "hostname": "6925a30a6f6e",
+      "time": "5.604"
+    },
+    {
+      "name": "mods.eamedia.WallTelevisionTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:02.214Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.027"
+    },
+    {
+      "name": "mods.eamedia.MediaModelsTest",
+      "tests": "1",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:01.860Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.061"
+    },
+    {
+      "name": "mods.eamedia.AddonMigrationTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:33:16.760Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.211"
+    },
+    {
+      "name": "mods.eamedia.TelevisionTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:02.137Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.072"
+    },
+    {
+      "name": "mods.eamedia.ClientTelevisionTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:34:01.176Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.683"
+    },
+    {
+      "name": "mods.eamedia.BundledChromiumTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-29T22:33:16.973Z",
+      "hostname": "6925a30a6f6e",
+      "time": "38.592"
+    }
+  ]
+}

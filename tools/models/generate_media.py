@@ -60,3 +60,16 @@ for kind in ["tv","jukebox"]:
  # stays on the existing left terminal; reverse winding to preserve outward normals.
  m.p={part:[[(x,y,-z) for x,y,z in reversed(face)] for face in faces] for part,faces in m.p.items()}
  m.save('industrial_'+kind)
+
+# Wall TV: same picture area and electrical front; brackets replace the tabletop foot.
+m=Mesh()
+m.box('Base',-.46,-.28,-.50,.92,.62,.03)
+m.box('Trim',-.34,-.19,-.47,.68,.44,.06)
+m.box('Case',-1.36,-.44,-.40,2.72,1.59,.12)
+m.box('Trim',-1.32,-.40,-.277,2.64,1.51,.018)
+m.box('Screen',-1.28,-.36,-.257,2.56,1.44,.001)
+m.box('Indicator',-.015,-.421,-.257,.03,.008,.003)
+for x in [-.75,.75]:
+ for y in [-.20,.65]:m.cyl('Trim',2,(x,y,-.405),.01,.02,n=12)
+m.box('Input',-1.37,-.34,-.38,.04,.10,.07)
+m.save('wall_browser_tv')

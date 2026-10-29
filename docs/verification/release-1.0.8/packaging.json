@@ -1,0 +1,14 @@
+[
+  {
+    "jar": "EAMedia-1.0.8.jar",
+    "bytes": 764706321,
+    "sha256": "bb9151eb8f257ae33807638d6b38a940aafcfc594ff35d542551857d2e384d32",
+    "compiledClassesMatch": true
+  },
+  {
+    "jar": "EAMedia-1.0.8-server.jar",
+    "bytes": 623945,
+    "sha256": "c861c3d585ef75be0c2f65dfc676859616f99f7c37051682ab6d1af967946c87",
+    "compiledClassesMatch": true
+  }
+]

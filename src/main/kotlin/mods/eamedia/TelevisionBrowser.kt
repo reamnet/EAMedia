@@ -224,11 +224,12 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
             (render.front ?: Direction.ZP).inverse.glRotateZnRef();GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
             try {
                 FixedFunction.bindTexture(picture);GL11.glEnable(GL11.GL_TEXTURE_2D);UtilsClient.disableLight();GL11.glColor3f(1f,1f,1f)
+                val display=render.transparentNodeDescriptor as MediaDescriptor
                 GL11.glBegin(GL11.GL_QUADS);GL11.glNormal3f(0f,0f,1f)
-                GL11.glTexCoord2f(0f,1f);GL11.glVertex3d(-1.28,-.12,.141)
-                GL11.glTexCoord2f(1f,1f);GL11.glVertex3d(1.28,-.12,.141)
-                GL11.glTexCoord2f(1f,0f);GL11.glVertex3d(1.28,1.32,.141)
-                GL11.glTexCoord2f(0f,0f);GL11.glVertex3d(-1.28,1.32,.141)
+                GL11.glTexCoord2f(0f,1f);GL11.glVertex3d(-1.28,display.screenBottom,display.screenZ)
+                GL11.glTexCoord2f(1f,1f);GL11.glVertex3d(1.28,display.screenBottom,display.screenZ)
+                GL11.glTexCoord2f(1f,0f);GL11.glVertex3d(1.28,display.screenTop,display.screenZ)
+                GL11.glTexCoord2f(0f,0f);GL11.glVertex3d(-1.28,display.screenTop,display.screenZ)
                 GL11.glEnd()
             } finally { UtilsClient.enableLight();GL11.glPopAttrib() }
         }

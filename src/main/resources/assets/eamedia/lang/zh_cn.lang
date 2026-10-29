@@ -25,7 +25,9 @@ Use_a_complete_HTTPS_audio_or_YouTube_address=Use a complete HTTPS audio or YouT
 # src/main/kotlin/mods/eamedia/MediaClient.kt
 Blue_left_or_bottom\:_power_input;_120/240_V_cords_or_fixed_cables=Blue left or bottom: power input; 120/240 V cords or fixed cables
 Interactive_Chromium_TV\:_webpages,_video_and_stereo_audio=Interactive Chromium TV: webpages, video and stereo audio
+Mount_against_a_vertical_wall;_the_screen_faces_into_the_room=Mount against a vertical wall; the screen faces into the room
 Powered_HTTPS_/_YouTube_jukebox_with_bundled_media_tools=Powered HTTPS / YouTube jukebox with bundled media tools
+Wall-mounted_Browser_Television.name=Wall-mounted Browser Television
 
 # src/main/kotlin/mods/eamedia/MediaElement.kt
 Disabled=已禁用

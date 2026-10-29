@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "eln:powered_browser_television"
+    },
+    {
+      "item": "eln:iron_plate"
+    }
+  ],
+  "result": {
+    "id": "eln:wall-mounted_browser_television",
+    "count": 1
+  }
+}

@@ -52,6 +52,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         slowProcessList.add(NodePeriodicPublishProcess(node,1.0,.5))
     }
     override fun initialize() { connect() }
+    override fun onNeighborBlockChange() { super.onNeighborBlockChange();(transparentNodeDescriptor as MediaDescriptor).checkWallSupport(this) }
     private fun loadedWorld(): ServerLevel? {
         val c=node?.coordinate ?: return null
         return DimensionIds.serverLevel(c.dimension)?.takeIf { it.chunkSource.getChunkNow(c.x shr 4,c.z shr 4)!=null }
@@ -98,7 +99,8 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     override fun getElectricalLoad(side: Direction,lrdu: LRDU)=when {
         side==front && lrdu==LRDU.Up->tripSignal
         side==front && lrdu==LRDU.Down->signal
-        (side==front.left() || side==Direction.YN) && lrdu==LRDU.Down && !cord.plugged->input
+        (side==front.left() || side==Direction.YN) && !cord.plugged &&
+            (if((transparentNodeDescriptor as MediaDescriptor).wallMounted)(transparentNodeDescriptor as MediaDescriptor).acceptsCable(front,side,lrdu) else lrdu==LRDU.Down)->input
         else->null
     }
     override fun getConnectionMask(side: Direction,lrdu: LRDU)=when(getElectricalLoad(side,lrdu)) {

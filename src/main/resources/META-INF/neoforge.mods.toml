@@ -13,7 +13,7 @@ description='''Optional powered TV and web jukebox addon for Electrical Age.'''
 [[dependencies.eamedia]]
 modId="eln"
 type="required"
-versionRange="[3.0.60,3.1)"
+versionRange="[3.0.67,3.1)"
 ordering="AFTER"
 side="BOTH"
 

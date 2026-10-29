@@ -6,23 +6,37 @@ import mods.eln.client.itemrender.IItemRenderer
 import mods.eln.client.terrain.BakedNodeRenderer
 import mods.eln.client.terrain.TerrainModels
 import mods.eln.i18n.I18N.tr
+import mods.eln.i18n.I18N.TR_NAME
+import mods.eln.i18n.I18N.Type
 import mods.eln.misc.*
 import mods.eln.node.transparent.*
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import java.io.DataInputStream
 
-class MediaDescriptor(val kind: MediaKind): TransparentNodeDescriptor(kind.title,MediaElement::class.java,MediaRender::class.java) {
+class MediaDescriptor(val kind: MediaKind,wallMounted: Boolean=false): PowerCabinetDescriptor(if(wallMounted)TR_NAME(Type.NONE,"Wall-mounted Browser Television") else kind.title,MediaElement::class.java,MediaRender::class.java,wallMounted) {
+    val modelName get()=if(wallMounted)"wall_browser_tv" else kind.model
+    val screenZ get()=if(wallMounted)-.255 else .141
+    val screenBottom get()=if(wallMounted)-.36 else -.12
+    val screenTop get()=screenBottom+1.44
     // ELN's model folder only scans the core mod file, not addon jars. Own this
     // model here so both terrain bodies and item previews receive real geometry.
     internal val model by lazy {
         Obj3D().also {
-            check(it.loadFile("${kind.model}/${kind.model}.obj")) { "Could not load EA Media model ${kind.model}" }
-            check(it.getPart("Case")!=null && it.getPart("Base")!=null) { "Incomplete EA Media model ${kind.model}" }
+            check(it.loadFile("${modelName}/${modelName}.obj")) { "Could not load EA Media model ${modelName}" }
+            check(it.getPart("Case")!=null && it.getPart("Base")!=null) { "Incomplete EA Media model ${modelName}" }
         }
     }
     init { creativeTab=Eln.creativeTabMachines }
     override fun mustHaveFloor()=false
+    override fun addCollisionBoxesToList(box: net.minecraft.world.phys.AABB,list: MutableList<net.minecraft.world.phys.AABB?>,world: net.minecraft.world.level.Level?,x: Int,y: Int,z: Int) {
+        if(!wallMounted) { super.addCollisionBoxesToList(box,list,world,x,y,z);return }
+        val tile=world?.getBlockEntity(net.minecraft.core.BlockPos(x,y,z)) as? TransparentNodeEntity
+        val front=tile?.elementRender?.front ?: (tile?.node as? TransparentNode)?.element?.front ?: return
+        val points=listOf(-1.36,1.36).flatMap { a -> listOf(-.50,-.24).map { b -> mods.eln.transparentnode.worklight.WorkLightOptics.world(front,net.minecraft.world.phys.Vec3(a,0.0,b)) } }
+        val bounds=net.minecraft.world.phys.AABB(points.minOf { it.x }+.5,.06,points.minOf { it.z }+.5,points.maxOf { it.x }+.5,1.65,points.maxOf { it.z }+.5).move(x.toDouble(),y.toDouble(),z.toDouble())
+        if(box.intersects(bounds))list.add(bounds)
+    }
     fun draw(front: Direction,on: Boolean)=preserveMatrix {
         front.inverse.glRotateZnRef();GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         try {
@@ -39,6 +53,7 @@ class MediaDescriptor(val kind: MediaKind): TransparentNodeDescriptor(kind.title
     override fun shouldUseRenderHelper(type: IItemRenderer.ItemRenderType,item: ItemStack,helper: IItemRenderer.ItemRendererHelper)=true
     override fun renderItem(type: IItemRenderer.ItemRenderType,item: ItemStack,vararg data: Any)=draw(Direction.ZN,false)
     override fun addInformation(stack: ItemStack?,player: Player?,list: MutableList<String>,advanced: Boolean) {
+        if(wallMounted)list.add(tr("Mount against a vertical wall; the screen faces into the room"))
         list.add(tr("Blue left or bottom: power input; 120/240 V cords or fixed cables"))
         list.add(if(kind==MediaKind.TV)tr("Interactive Chromium TV: webpages, video and stereo audio") else tr("Powered HTTPS / YouTube jukebox with bundled media tools"))
     }
