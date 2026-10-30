@@ -63,7 +63,10 @@ object WebRoutingNetwork {
     @Volatile private var enabled=false
     private val allowLoopback get()=java.lang.Boolean.getBoolean("eamedia.mirrorServer") && java.lang.Boolean.getBoolean("eamedia.webTestLoopback")
     @SubscribeEvent fun start(e: ServerStartedEvent) {
-        try {domains=WebDomains.load(Path.of("config/eamedia-web-domains.txt"));enabled=System.getProperty("eamedia.webRouting","true").toBoolean()}
+        try {
+            domains=WebDomains.load(Path.of("config/eamedia-web-domains.txt"));enabled=System.getProperty("eamedia.webRouting","true").toBoolean()
+            if(enabled)mods.eln.Eln.LOGGER.info("TV web routing policy: {}",if(domains.allPublicWebsites)"all public HTTP(S) websites" else "server-approved domains")
+        }
         catch(error: Exception){enabled=false;mods.eln.Eln.LOGGER.error("Cannot load config/eamedia-web-domains.txt; TV web routing remains disabled",error)}
         running=true
     }

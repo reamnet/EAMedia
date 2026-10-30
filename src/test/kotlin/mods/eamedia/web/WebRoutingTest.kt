@@ -23,16 +23,39 @@ class WebRoutingTest {
         val text=WebMessage(WebMessage.DATA,1,bytes="Cookie: private-value".toByteArray()).toString()
         assertFalse(text.contains("Cookie"));assertFalse(text.contains("private-value"));assertTrue(text.contains("bytes=21"))
     }
-    @Test fun operatorAllowlistHasDomainBoundariesAndRejectsUnrestrictedEntries() {
+    @Test fun operatorAllowlistHasDomainBoundariesAndRejectsMalformedEntries() {
         val domains=WebDomains(WebDomains.defaults)
         assertTrue(domains.allows("www.youtube.com"));assertTrue(domains.allows("rr1.googlevideo.com"))
         assertFalse(domains.allows("youtube.com.evil.example"));assertFalse(domains.allows("evilyoutube.com"))
         assertFalse(domains.allows("example.com"))
-        for(entry in listOf("*","*.com","com","https://youtube.com/","youtube.com\r\nevil.example"))assertThrows(IllegalArgumentException::class.java){WebDomains(listOf(entry))}
+        for(entry in listOf("*.com","com","https://youtube.com/","youtube.com\r\nevil.example"))assertThrows(IllegalArgumentException::class.java){WebDomains(listOf(entry))}
         val file=temp.root.toPath().resolve("config/domains.txt")
         assertEquals(domains.entries,WebDomains.load(file).entries)
         Files.writeString(file,"# Operator-approved additional site\nexample.com\n")
         assertTrue(WebDomains.load(file).allows("video.example.com"));assertFalse(WebDomains.load(file).allows("youtube.com"))
+    }
+    @Test fun operatorWildcardAllowsPublicWebsitesButStillRejectsPrivateMixedDnsAndNonWebPorts() {
+        val file=temp.root.toPath().resolve("config/domains.txt")
+        WebDomains.load(file)
+        assertFalse(WebDomains.load(file).allPublicWebsites)
+        Files.writeString(file,"# Explicit server-owner opt-in\n*\n")
+        val all=WebDomains.load(file)
+        assertTrue(all.allPublicWebsites);assertTrue(all.allows("example.org"));assertTrue(all.allows("cdn.another-site.example"))
+        val public=WebDestination(all,resolver={arrayOf(InetAddress.getByName("8.8.8.8"))})
+        assertEquals(443,public.resolve("example.org",443).port)
+        assertEquals(80,public.resolve("another.example",80).port)
+        for(port in listOf(0,22,25565,65535))assertThrows(IllegalArgumentException::class.java){public.resolve("example.org",port)}
+        for(ip in listOf("0.0.0.0","127.0.0.1","10.0.0.1","172.16.0.1","192.168.0.1","169.254.169.254","100.64.0.1","::1","fc00::1","fe80::1","2001:db8::1")) {
+            val blocked=WebDestination(all,resolver={arrayOf(InetAddress.getByName(ip))})
+            assertThrows(IllegalArgumentException::class.java){blocked.resolve("example.org",443)}
+        }
+        val mixed=WebDestination(all,resolver={arrayOf(InetAddress.getByName("8.8.8.8"),InetAddress.getByName("10.0.0.1"))})
+        assertThrows(IllegalArgumentException::class.java){mixed.resolve("example.org",443)}
+        // The server tells clients which policy is active using the existing bounded status packet.
+        val status=wire(WebMessage(WebMessage.STATUS,host=all.entries.joinToString(","),credit=1))
+        assertTrue(WebDomains(status.host.split(',')).allPublicWebsites)
+        Files.writeString(file,"youtube.com\n")
+        assertFalse(WebDomains.load(file).allPublicWebsites);assertFalse(WebDomains.load(file).allows("example.org"))
     }
     @Test fun destinationApprovalRunsBeforeDnsAndRejectsPrivateOrReboundAddresses() {
         val count=AtomicInteger();val domains=WebDomains(listOf("example.com"))
@@ -69,15 +92,34 @@ class WebRoutingTest {
         assertThrows(IllegalArgumentException::class.java){wire(WebMessage(WebMessage.DATA,1,bytes=ByteArray(WebMessage.CHUNK+1)))}
         assertThrows(IllegalArgumentException::class.java){wire(WebMessage(WebMessage.CREDIT,1,credit=WebMessage.WINDOW+1))}
     }
-    private inner class Harness: AutoCloseable {
+    private inner class Harness(val domains: WebDomains=WebDomains(listOf("127.0.0.1"))): AutoCloseable {
         val client=BrowserWebClient();private val key=Any()
         private val up=Executors.newSingleThreadExecutor();private val down=Executors.newSingleThreadExecutor()
-        val domains=WebDomains(listOf("127.0.0.1"))
         val peer=WebPeer(WebDestination(domains,true),{message->down.execute{client.receive(key,wire(message))}},{WebDialer.connect(it,upstream=null,testLoopback=true)})
         val port=client.start()
         init {client.attach(key,{message->up.execute{peer.receive(wire(message))}},true,domains)}
         fun socket(targetPort: Int)=Socket(Proxy(Proxy.Type.SOCKS,InetSocketAddress("127.0.0.1",port))).apply{soTimeout=5000;connect(InetSocketAddress.createUnresolved("127.0.0.1",targetPort),5000)}
         override fun close(){client.close();peer.close();up.shutdownNow();down.shutdownNow()}
+    }
+    @Test fun wildcardPolicyRoundTripsHttpThroughTheSameSocksAndPacketTransport() {
+        ServerSocket(0,1,InetAddress.getByName("127.0.0.1")).use { origin->
+            val served=CompletableFuture.runAsync {
+                origin.accept().use { socket->
+                    val reader=socket.getInputStream().bufferedReader();while(reader.readLine().isNotEmpty()){}
+                    socket.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Length: 8\r\nConnection: close\r\n\r\nwildcard".toByteArray())
+                }
+            }
+            // Loopback is allowed only by the harness's explicit development-only policy.
+            // The production wildcard's private-address rejection is checked separately above.
+            Harness(WebDomains(listOf("*"))).use { route->
+                route.socket(origin.localPort).use { browser->
+                    browser.getOutputStream().write("GET /fixture HTTP/1.1\r\nHost: fixture\r\n\r\n".toByteArray())
+                    assertTrue(browser.getInputStream().readAllBytes().toString(Charsets.UTF_8).endsWith("wildcard"))
+                    assertTrue(route.peer.opened.get()>0)
+                }
+            }
+            served.get(10,TimeUnit.SECONDS)
+        }
     }
     @Test fun realHttpBodyLargerThanWindowSurvivesFlowControlAndHalfClose() {
         val bytes=ByteArray(250_000){(it%251).toByte()}

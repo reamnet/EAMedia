@@ -1,0 +1,254 @@
+{
+  "installedCore": "3.0.68",
+  "installedAddon": "1.0.10",
+  "allModels": {
+    "models": 225,
+    "quads": 236002,
+    "finishBatches": 225
+  },
+  "mediaPreviews": [
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    }
+  ],
+  "mediaAfterReload": [
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:wall-mounted_browser_television",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 564
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_browser_television",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 384
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "GUI",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "GROUND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "FIXED",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "FIRST_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    },
+    {
+      "item": "eln:powered_web_jukebox",
+      "context": "THIRD_PERSON_RIGHT_HAND",
+      "baked": true,
+      "converted": true,
+      "alreadyBaked": false,
+      "quads": 900
+    }
+  ],
+  "failure": null
+}

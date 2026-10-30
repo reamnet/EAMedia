@@ -1,0 +1,12 @@
+{
+  "jar": "EAMedia-1.0.10.jar",
+  "bytes": 764713235,
+  "sha256": "7b81c5e2376cd9d15e2fc84870bcf3d090178a90157212d348bc0b34669779bd",
+  "matchingChangedModelMaterialImageAssets": 6,
+  "matchingGeneratedItemModels": 0,
+  "version": "1.0.10",
+  "serverJar": {
+    "bytes": 630859,
+    "sha256": "92a31b78bf3723903c7f349d042cafa3ea69c9dd621909afb5d772cedb1c3075"
+  }
+}

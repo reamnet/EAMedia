@@ -1,0 +1,23 @@
+[
+  {
+    "model": "industrial_jukebox/industrial_jukebox.obj",
+    "originalFaces": 568,
+    "faces": 912,
+    "sha256": "3200968c2ee6c9464eb8da504b768fb3df95c0f1680290c23b038fce79f75669",
+    "beveledBoxes": 1
+  },
+  {
+    "model": "industrial_tv/industrial_tv.obj",
+    "originalFaces": 96,
+    "faces": 396,
+    "sha256": "2a7cc3f8b59dd2ff1f2cab9491160f7270246aed897c968a93776510c09eeb6a",
+    "beveledBoxes": 1
+  },
+  {
+    "model": "wall_browser_tv/wall_browser_tv.obj",
+    "originalFaces": 276,
+    "faces": 576,
+    "sha256": "9c61446b37e91342ca30ab955fa02a2b4bd2cf551a34aa5171b6464fbd6db349",
+    "beveledBoxes": 1
+  }
+]

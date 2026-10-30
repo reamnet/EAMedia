@@ -8,7 +8,7 @@ java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 kotlin { jvmToolchain(21); compilerOptions { jvmTarget.set(JvmTarget.JVM_21) } }
 
 // Build ELN once, or point at any matching published/local core jar. Never embed it in EAMedia.
-val minimumElnVersion = "3.0.67"
+val minimumElnVersion = "3.0.68"
 val elnJar = file(providers.gradleProperty("elnJar").getOrElse("../ELN1.21.1ForkPatch/build/libs/ElectricalAge-$minimumElnVersion.jar"))
 val verifyEln by tasks.registering {
     group = "verification"

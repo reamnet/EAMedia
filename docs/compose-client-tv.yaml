@@ -2,7 +2,7 @@
 # Website routing uses the existing game port; approve domains in
 # ./data/config/eamedia-web-domains.txt after first server start.
 # Put EAMedia-1.0.9-server.jar (or the full jar) in ./data/mods/.
-# Every client needs the full EAMedia-1.0.9.jar. Install one addon variant per side.
+# Every client needs the full EAMedia-1.0.10.jar. Install one addon variant per side.
 services:
   minecraft:
     image: itzg/minecraft-server:java21

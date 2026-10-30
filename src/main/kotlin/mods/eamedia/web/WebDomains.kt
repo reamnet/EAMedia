@@ -5,21 +5,22 @@ import java.nio.file.Path
 import java.util.Locale
 import java.util.UUID
 
-/** Only server operators choose domains. No wildcard/unrestricted mode. */
+/** Server-owned policy. A literal '*' opts into public websites; destination checks still apply. */
 class WebDomains(entries: Iterable<String>) {
     val entries=entries.map{it.trim().lowercase(Locale.ROOT).removeSuffix(".")}.filter{it.isNotEmpty()}.toSet().also { values->
-        require(values.size<=32 && values.all { it.length in 3..253 && it.contains('.') && it.split('.').all{label->label.isNotEmpty() && label.length<=63 && label.first().isLetterOrDigit() && label.last().isLetterOrDigit() && label.all{c->c in 'a'..'z' || c in '0'..'9' || c=='-'}} }){"Invalid approved web domains"}
+        require(values.size<=32 && values.all { it=="*" || it.length in 3..253 && it.contains('.') && it.split('.').all{label->label.isNotEmpty() && label.length<=63 && label.first().isLetterOrDigit() && label.last().isLetterOrDigit() && label.all{c->c in 'a'..'z' || c in '0'..'9' || c=='-'}} }){"Invalid approved web domains"}
     }
+    val allPublicWebsites get()="*" in entries
     fun allows(host: String): Boolean {
         val name=host.lowercase(Locale.ROOT).removeSuffix(".")
-        return entries.any{name==it || name.endsWith(".$it")}
+        return name.isNotEmpty() && (allPublicWebsites || entries.any{name==it || name.endsWith(".$it")})
     }
     companion object {
         val defaults=listOf("youtube.com","youtube-nocookie.com","googlevideo.com","ytimg.com","gstatic.com","youtubei.googleapis.com","consent.google.com","jnn-pa.googleapis.com","youtubeembeddedplayer.googleapis.com","yt3.ggpht.com","yt4.ggpht.com")
         fun load(path: Path): WebDomains {
             if(!Files.exists(path)) {
                 Files.createDirectories(path.parent)
-                Files.writeString(path,"# TV website domains approved by the server owner.\n# Each entry also permits its subdomains. No wildcard mode. Restart after edits.\n"+defaults.joinToString("\n")+"\n")
+                Files.writeString(path,"# TV website domains approved by the server owner.\n# Each entry also permits its subdomains. Restart after edits.\n# Optional: add * on its own line to permit all public HTTP/HTTPS websites.\n# Private/local addresses and non-web ports remain blocked in either mode.\n"+defaults.joinToString("\n")+"\n")
             }
             require(Files.size(path)<=16384){"Approved-domain file is too large"}
             return WebDomains(Files.readAllLines(path).map{it.substringBefore('#').trim()})

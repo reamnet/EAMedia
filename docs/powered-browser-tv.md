@@ -89,9 +89,21 @@ example.com
 video.example.net
 ```
 
-Up to 32 domain entries are supported. Wildcards/unrestricted entries are not
-accepted. Page resources, embedded players, login providers and CDNs also need
-approval if they use other domains. The server logs newly blocked domains
+Up to 32 entries are supported. To allow **all public websites** in EA Media 1.0.10+, add a literal `*` on its own line (or replace the other entries with it):
+
+```text
+*
+```
+
+Restart the Minecraft server after saving. With the Compose service named `minecraft`:
+
+```bash
+docker compose restart minecraft
+```
+
+Install 1.0.10 on the server and all clients. This setting belongs to the server owner; a TV viewer cannot enable it from the browser. It retains server routing, active-host authorization, connection/bandwidth limits, and rejection of local/private destinations and ports other than 80/443. The default remains the domain list above. Remove `*` and restart to return to specific domains.
+
+In domain-list mode, page resources, embedded players, login providers and CDNs also need approval if they use other domains. The server logs newly blocked domains
 (without full URLs or cookies) to help the owner update the file. Private/local addresses and ports other
 than 80/443 are rejected even when a domain is listed. A blocked main page shows
 “This website is not approved by the server.” YouTube/other sites can still

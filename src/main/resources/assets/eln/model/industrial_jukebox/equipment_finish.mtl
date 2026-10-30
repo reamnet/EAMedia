@@ -1,0 +1,23 @@
+newmtl Neutral
+Kd 1 1 1
+newmtl eln_detail_label
+Kd 1.000 1.000 1.000
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_detail_metal
+Kd 0.700 0.740 0.760
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_detail_rubber
+Kd 0.075 0.085 0.095
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_detail_screw
+Kd 1.000 1.000 1.000
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_finish_metal
+Kd 0.700 0.740 0.760
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_finish_paint
+Kd 1.000 1.000 1.000
+map_Kd eln:textures/block/equipment_finishes.png
+newmtl eln_finish_rubber
+Kd 0.075 0.085 0.095
+map_Kd eln:textures/block/equipment_finishes.png
