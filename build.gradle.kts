@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.jar.JarFile
+import java.util.zip.ZipException
 plugins { `java-library`; id("org.jetbrains.kotlin.jvm"); id("net.neoforged.moddev") }
 group = "mods.eamedia"
 version = providers.gradleProperty("modVersion").get()
@@ -6,9 +8,36 @@ java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 kotlin { jvmToolchain(21); compilerOptions { jvmTarget.set(JvmTarget.JVM_21) } }
 
 // Build ELN once, or point at any matching published/local core jar. Never embed it in EAMedia.
-val elnJar = file(providers.gradleProperty("elnJar").getOrElse("../ELN1.21.1ForkPatch/build/libs/ElectricalAge-3.0.60.jar"))
+val minimumElnVersion = "3.0.67"
+val elnJar = file(providers.gradleProperty("elnJar").getOrElse("../ELN1.21.1ForkPatch/build/libs/ElectricalAge-$minimumElnVersion.jar"))
 val verifyEln by tasks.registering {
-    doLast { require(elnJar.isFile) { "Build ELN 3.0.60 first, or pass -PelnJar=/absolute/path/ElectricalAge-3.0.60.jar" } }
+    group = "verification"
+    description = "Checks the selected ELN jar's version and required APIs before compiling."
+    doLast {
+        val advice = "Build ELN $minimumElnVersion first, or pass -PelnJar=/absolute/path/ElectricalAge-$minimumElnVersion.jar"
+        require(elnJar.isFile) { "ELN compile dependency not found: $elnJar\n$advice" }
+        try {
+            JarFile(elnJar).use { jar ->
+                val metadata = jar.getJarEntry("META-INF/neoforge.mods.toml")?.let {
+                    jar.getInputStream(it).bufferedReader().use { reader -> reader.readText() }
+                }.orEmpty()
+                val mod = metadata.substringAfter("[[mods]]", "").substringBefore("[[")
+                val coreVersion = Regex("""(?m)^\s*version\s*=\s*"([^"]+)"""").find(mod)?.groupValues?.get(1)
+                val patch = coreVersion?.let { Regex("""3\.0\.(\d+)(?:[-+].*)?""").matchEntire(it)?.groupValues?.get(1)?.toIntOrNull() }
+                val compactUps = jar.getJarEntry("mods/eln/transparentnode/ups/CompactUpsElement.class") != null
+                val wallTv = jar.getJarEntry("mods/eln/api/media/ReservedMediaDevice.class")?.let {
+                    jar.getInputStream(it).use { stream -> stream.readBytes().toString(Charsets.ISO_8859_1).contains("WALL_TV") }
+                } == true
+                require(patch != null && patch >= minimumElnVersion.substringAfterLast('.').toInt() && compactUps && wallTv) {
+                    "Incompatible ELN compile dependency: $elnJar (version ${coreVersion ?: "unknown"}).\n" +
+                        "EA Media requires ELN $minimumElnVersion or newer in the 3.0 series, including WALL_TV and CompactUpsElement.\n$advice"
+                }
+                logger.lifecycle("ELN compile dependency: $elnJar (version $coreVersion)")
+            }
+        } catch (error: ZipException) {
+            throw GradleException("ELN compile dependency is not a valid jar: $elnJar\n$advice", error)
+        }
+    }
 }
 tasks.named("compileKotlin") { dependsOn(verifyEln) }
 neoForge {

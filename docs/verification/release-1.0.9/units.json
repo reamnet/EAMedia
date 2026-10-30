@@ -1,0 +1,118 @@
+{
+  "tests": 56,
+  "suites": [
+    {
+      "name": "mods.eamedia.SharedTelevisionTest",
+      "tests": "10",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.839Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.085"
+    },
+    {
+      "name": "mods.eamedia.web.WebRoutingTest",
+      "tests": "12",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.991Z",
+      "hostname": "6925a30a6f6e",
+      "time": "1.195"
+    },
+    {
+      "name": "mods.eamedia.WebJukeboxTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.984Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.006"
+    },
+    {
+      "name": "mods.eamedia.ServerTelevisionTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.685Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.153"
+    },
+    {
+      "name": "mods.eamedia.BundledMediaRuntimeTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:30:57.245Z",
+      "hostname": "6925a30a6f6e",
+      "time": "3.83"
+    },
+    {
+      "name": "mods.eamedia.WallTelevisionTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.968Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.015"
+    },
+    {
+      "name": "mods.eamedia.MediaModelsTest",
+      "tests": "1",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.675Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.009"
+    },
+    {
+      "name": "mods.eamedia.AddonMigrationTest",
+      "tests": "2",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:30:33.666Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.072"
+    },
+    {
+      "name": "mods.eamedia.TelevisionTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.925Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.041"
+    },
+    {
+      "name": "mods.eamedia.ClientTelevisionTest",
+      "tests": "6",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:31:01.078Z",
+      "hostname": "6925a30a6f6e",
+      "time": "0.597"
+    },
+    {
+      "name": "mods.eamedia.BundledChromiumTest",
+      "tests": "4",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-30T00:30:33.743Z",
+      "hostname": "6925a30a6f6e",
+      "time": "23.501"
+    }
+  ],
+  "buildCommand": "./gradlew --no-daemon --max-workers=2 --console=plain build",
+  "elnJarOverride": false,
+  "selectedCore": "ElectricalAge-3.0.67.jar"
+}

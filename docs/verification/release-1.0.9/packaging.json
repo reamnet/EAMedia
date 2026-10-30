@@ -1,0 +1,12 @@
+[
+  {
+    "jar": "EAMedia-1.0.9.jar",
+    "bytes": 764706321,
+    "sha256": "999efeadae9e33743308d515956385ab179878d8a7c46e21856b4a5517630ca3"
+  },
+  {
+    "jar": "EAMedia-1.0.9-server.jar",
+    "bytes": 623945,
+    "sha256": "3ab09d90594486fbea83d3d145287c6b12b0a0bc68d0186a702e5bd04879c722"
+  }
+]

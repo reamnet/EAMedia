@@ -1,0 +1,44 @@
+[
+  {
+    "case": "explicit-current",
+    "passed": true,
+    "expectedSuccess": true,
+    "exitCode": 0,
+    "messageChecked": "version 3.0.67"
+  },
+  {
+    "case": "old-3.0.60-before-compiler",
+    "passed": true,
+    "expectedSuccess": false,
+    "exitCode": 1,
+    "messageChecked": "version 3.0.60"
+  },
+  {
+    "case": "old-3.0.66",
+    "passed": true,
+    "expectedSuccess": false,
+    "exitCode": 1,
+    "messageChecked": "version 3.0.66"
+  },
+  {
+    "case": "renamed-old-jar",
+    "passed": true,
+    "expectedSuccess": false,
+    "exitCode": 1,
+    "messageChecked": "version 3.0.60"
+  },
+  {
+    "case": "missing-file",
+    "passed": true,
+    "expectedSuccess": false,
+    "exitCode": 1,
+    "messageChecked": "ELN compile dependency not found"
+  },
+  {
+    "case": "invalid-archive",
+    "passed": true,
+    "expectedSuccess": false,
+    "exitCode": 1,
+    "messageChecked": "ELN compile dependency is not a valid jar"
+  }
+]
