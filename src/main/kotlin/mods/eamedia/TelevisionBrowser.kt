@@ -143,6 +143,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
                 val initialUrl=url
                 val initialPlayback=render.tvPlayback
                 fun install(frame: CefFrame) {
+                    if(!mods.eamedia.server.BrowserWorker.CapturePolicy.allows(frame.url))return
                     val s=if(frame.url==initialUrl)initialPlayback else TelevisionPlayback()
                     val resume=com.google.gson.Gson().toJson(mapOf("position" to s.position,"paused" to s.paused,"rate" to s.rate,"known" to s.known))
                     frame.executeJavaScript("window.__eaTVRelayAudio=true;window.__eaTVResume=$resume;\n"+captureTemplate,frame.url.orEmpty(),0)

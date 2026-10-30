@@ -192,3 +192,29 @@ The default server-mode limit is two active browsers; override it with
 `-Deamedia.serverBrowserLimit=4` (range 1–8). A server-hosted TV keeps its page
 alive without viewers while loaded and powered. Chunk unload, power loss,
 removal and server stop close the worker. No mode force-loads chunks.
+
+## Browser verification pages and web test servers (1.0.11)
+
+Restart every client after installing 1.0.11: Chromium startup settings cannot be
+changed by simply toggling a TV. The bundled engine is Chromium 116. The browser now keeps its native Chromium version
+in the user agent, instead of MCEF's replacement `MCEF/2` product. Explicit user
+agent overrides are preserved. Normal web-origin and TLS checks are enabled.
+Turnstile frames and Cloudflare challenge infrastructure are excluded from the
+TV's audio-capture instrumentation. No CAPTCHA-solving or clearance-cookie
+sharing is performed. Cloudflare can still reject the bundled embedded engine or
+the Minecraft server's public IP; successful Rumble verification is not guaranteed.
+MCEF 2.1.6 remains the newest published NeoForge 1.21.1 build checked for this patch.
+
+Server-routed browsing now allows public web endpoints on **80, 443, 8080 and
+8443**. This includes the alternate HTTP/WebSocket ports commonly used by Ookla
+Speedtest servers. The server owner can replace this set using a JVM property such
+as `-Deamedia.webPorts=80,443`; up to sixteen explicit ports are accepted. The
+website-domain file (including an existing `*` choice), public-address checks and
+host permission still apply. Additional blocked hosts/ports are reported once per
+peer in the Minecraft server log, without page contents or cookies.
+
+A speed test in the TV measures the complete server-routed Minecraft connection,
+including the mod's bandwidth limit and transport overhead. It is not a direct ISP
+speed measurement. The route remains TCP-based; sites that require UDP/WebRTC test
+traffic may be unsupported. No website traffic falls back to the player's direct
+connection.

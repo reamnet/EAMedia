@@ -14,4 +14,8 @@ public abstract class BrowserWebProxyMixin {
 
     @ModifyArg(method="init",at=@At(value="INVOKE",target="Lorg/cef/CefApp;getInstance([Ljava/lang/String;Lorg/cef/CefSettings;)Lorg/cef/CefApp;"),index=0)
     private static String[] eamedia$routeEngine(String[] original){return BrowserWebProxy.arguments(original);}
+    @ModifyArg(method="init",at=@At(value="INVOKE",target="Lorg/cef/CefApp;getInstance([Ljava/lang/String;Lorg/cef/CefSettings;)Lorg/cef/CefApp;"),index=1)
+    private static org.cef.CefSettings eamedia$nativeIdentity(org.cef.CefSettings settings){
+        return mods.eamedia.BrowserCompatibility.settings(settings);
+    }
 }

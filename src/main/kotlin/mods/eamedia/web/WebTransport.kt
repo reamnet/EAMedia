@@ -114,17 +114,24 @@ internal class WebPipe(val id: Int,private val socket: Socket,private val send: 
 
 internal class WebDomainDenied(val domain: String): IllegalArgumentException("Website is not approved by the server")
 
-internal class WebDestination(private val domains: WebDomains=WebDomains(WebDomains.defaults),private val allowTestLoopback: Boolean=false,private val resolver: (String)->Array<InetAddress> = {InetAddress.getAllByName(it)}) {
+internal class WebPortDenied(val host: String,val port: Int): IllegalArgumentException("Website port is not approved by the server")
+
+internal class WebDestination(private val domains: WebDomains=WebDomains(WebDomains.defaults),private val allowTestLoopback: Boolean=false,private val ports: Set<Int> = webPorts(),private val resolver: (String)->Array<InetAddress> = {InetAddress.getAllByName(it)}) {
     data class Address(val host: String,val port: Int,val addresses: List<InetAddress>)
     fun resolve(host: String,port: Int): Address {
         require(host.length in 1..253 && host.all{it.isLetterOrDigit() && it.code<128 || it in ".-:"}){"Invalid website address"}
         if(!domains.allows(host))throw WebDomainDenied(host)
         val addresses=resolver(host).toList();require(addresses.isNotEmpty())
         require(addresses.all { publicAddress(it) || allowTestLoopback && it.isLoopbackAddress }){"Website address is not public"}
-        require(port==80 || port==443 || allowTestLoopback && port in 1..65535 && addresses.all{it.isLoopbackAddress}){"Website port is not allowed"}
+        if(port !in ports && !(allowTestLoopback && port in 1..65535 && addresses.all{it.isLoopbackAddress}))throw WebPortDenied(host,port)
         return Address(host,port,addresses)
     }
     companion object {
+        internal fun webPorts(value: String=System.getProperty("eamedia.webPorts","80,443,8080,8443")): Set<Int> {
+            val ports=value.split(',').map { it.trim().toInt() }.toSet()
+            require(ports.isNotEmpty() && ports.size<=16 && ports.all { it in 1..65535 }) { "Invalid TV web ports" }
+            return ports
+        }
         internal fun publicAddress(address: InetAddress): Boolean {
             if(address.isAnyLocalAddress || address.isLoopbackAddress || address.isLinkLocalAddress || address.isSiteLocalAddress || address.isMulticastAddress)return false
             val b=address.address.map{it.toInt() and 255}

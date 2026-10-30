@@ -1,5 +1,8 @@
 // One host captures this document. Viewers receive pixels/PCM, never a second webpage session.
 (() => {
+    // Do not wrap audio APIs inside a verification page or its Turnstile iframe.
+    if (location.hostname === 'challenges.cloudflare.com' || location.hostname.endsWith('.challenges.cloudflare.com') ||
+        location.pathname.startsWith('/cdn-cgi/challenge-platform/') || document.querySelector('#challenge-running, #challenge-stage')) return;
     if (window.__eaTVCapture || typeof window.eaTvCapture !== 'function') return;
     window.__eaTVCapture = true;
     const send = value => {

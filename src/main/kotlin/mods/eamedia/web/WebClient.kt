@@ -96,7 +96,7 @@ object BrowserWebProxy {
     val client=BrowserWebClient()
     @JvmStatic fun arguments(original: Array<String>): Array<String> {
         val port=client.start()
-        val keys=listOf("--proxy-server","--proxy-bypass-list","--host-resolver-rules","--force-webrtc-ip-handling-policy")
+        val keys=listOf("--proxy-server","--proxy-bypass-list","--host-resolver-rules","--force-webrtc-ip-handling-policy","--disable-web-security","--ignore-certificate-errors")
         return (original.filter{arg->keys.none{arg.startsWith(it)}}+listOf(
             "--proxy-server=socks5://127.0.0.1:$port","--proxy-bypass-list=<-loopback>",
             "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1","--disable-quic",

@@ -114,7 +114,7 @@ object WebRoutingNetwork {
                 if(old?.connection===connection)old else {
                     old?.service?.close();val test=allowLoopback
                     val policy=if(test)WebDestination(domains,true){host->if(host=="fixture.eamedia.test")arrayOf(java.net.InetAddress.getByName("127.0.0.1"))else java.net.InetAddress.getAllByName(host)}else WebDestination(domains)
-                    Peer(connection,WebPeer(policy,{PacketDistributor.sendToPlayer(player,WebPacket(it))},{WebDialer.connect(it,testLoopback=test)},{mods.eln.Eln.LOGGER.info("TV web domain needs server approval: {} (config/eamedia-web-domains.txt)",it)}))
+                    Peer(connection,WebPeer(policy,{PacketDistributor.sendToPlayer(player,WebPacket(it))},{WebDialer.connect(it,testLoopback=test)},{mods.eln.Eln.LOGGER.info("TV web route needs server approval: {} (config/eamedia-web-domains.txt / eamedia.webPorts)",it)}))
                 }
             }
         }

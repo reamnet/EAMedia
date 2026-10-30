@@ -35,7 +35,8 @@ class ServerTelevisionTest {
             Object.assign(globalThis,{AudioNode,AudioDestinationNode,MediaStream,AudioContext});
             const media={readyState:2,volume:.7,muted:false,paused:false,currentTime:1,duration:10,playbackRate:1,
                 captureStream:()=>{captures++;return new MediaStream([{addEventListener:(name,fn)=>ended=fn}]);},getBoundingClientRect:()=>({width:960,height:540}),tagName:'VIDEO'};
-            globalThis.document={querySelectorAll:()=>[media],addEventListener:(name,fn)=>handlers[name]=fn};
+            globalThis.location={hostname:'fixture.example',pathname:'/media'};
+            globalThis.document={querySelector:()=>null,querySelectorAll:()=>[media],addEventListener:(name,fn)=>handlers[name]=fn};
             globalThis.setInterval=fn=>periodic=fn;globalThis.eaTvCapture=()=>{};
             // A viewer may be muted locally. It must never scale what the server captures.
             window.__elnTVGain=0;window.__eaTVRelayAudio=$relay;
@@ -64,6 +65,30 @@ class ServerTelevisionTest {
         try {
             assertTrue(process.waitFor(15,TimeUnit.SECONDS));val output=process.inputStream.bufferedReader().readText()
             assertEquals(0,process.exitValue(),output);assertTrue(output.contains("Server capture checks passed"))
+        }finally{process.destroyForcibly()}
+    }
+    @Test fun challengePagesReturnBeforeInstallingAnyAudioHooks() {
+        val capture=javaClass.getResourceAsStream("/assets/eln/browser/mirror-capture.js")!!.bufferedReader().use { it.readText() }
+        val code="""
+            const cases=[
+                {hostname:'challenges.cloudflare.com',pathname:'/turnstile/v0/test',challenge:false},
+                {hostname:'rumble.com',pathname:'/cdn-cgi/challenge-platform/test',challenge:false},
+                {hostname:'rumble.com',pathname:'/',challenge:true}
+            ];
+            for(const page of cases){
+                globalThis.window={eaTvCapture:()=>{}};
+                globalThis.location=page;globalThis.document={querySelector:()=>page.challenge?{}:null};
+                $capture
+                if(window.__eaTVCapture)throw Error('Challenge audio APIs were modified');
+            }
+            console.log('Challenge documents left untouched');
+        """.trimIndent()
+        val file=temp.root.toPath().resolve("challenge.js");Files.writeString(file,code)
+        val executable=BundledMediaRuntime(temp.root.toPath().resolve("tools")).resolve("quickjs")
+        val process=ProcessBuilder(executable.toString(),file.toString()).redirectErrorStream(true).start()
+        try {
+            assertTrue(process.waitFor(15,TimeUnit.SECONDS));val output=process.inputStream.bufferedReader().readText()
+            assertEquals(0,process.exitValue(),output)
         }finally{process.destroyForcibly()}
     }
     @Test fun noPlayerCanBecomeTheHostOrPublishAPlaybackReport() {

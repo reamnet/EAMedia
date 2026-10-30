@@ -57,6 +57,18 @@ class WebRoutingTest {
         Files.writeString(file,"youtube.com\n")
         assertFalse(WebDomains.load(file).allPublicWebsites);assertFalse(WebDomains.load(file).allows("example.org"))
     }
+    @Test fun speedtestWebsocketPortsUseTheSamePublicAddressChecksAndCanBeRestrictedByTheOperator() {
+        val all=WebDomains(listOf("*"))
+        val defaults=WebDestination.webPorts("80,443,8080,8443")
+        assertEquals(setOf(80,443,8080,8443),defaults)
+        val policy=WebDestination(all,ports=defaults,resolver={arrayOf(InetAddress.getByName("8.8.8.8"))})
+        for(port in defaults)assertEquals(port,policy.resolve("speed.example.org",port).port)
+        val restricted=WebDestination(all,ports=setOf(443),resolver={arrayOf(InetAddress.getByName("8.8.8.8"))})
+        assertThrows(WebPortDenied::class.java){restricted.resolve("speed.example.org",8080)}
+        val local=WebDestination(all,ports=defaults,resolver={arrayOf(InetAddress.getByName("127.0.0.1"))})
+        assertThrows(IllegalArgumentException::class.java){local.resolve("speed.example.org",8080)}
+        for(bad in listOf("","0","65536","443,nope"))assertThrows(IllegalArgumentException::class.java){WebDestination.webPorts(bad)}
+    }
     @Test fun destinationApprovalRunsBeforeDnsAndRejectsPrivateOrReboundAddresses() {
         val count=AtomicInteger();val domains=WebDomains(listOf("example.com"))
         val policy=WebDestination(domains,resolver={count.incrementAndGet();arrayOf(InetAddress.getByName("8.8.8.8"))})
@@ -227,8 +239,9 @@ class WebRoutingTest {
     }
     @Test fun chromiumHasOnlyLoopbackProxyAndNoDirectDnsOrUdpFallback() {
         try {
-            val args=BrowserWebProxy.arguments(arrayOf("--proxy-server=direct://","--proxy-bypass-list=*"))
+            val args=BrowserWebProxy.arguments(arrayOf("--proxy-server=direct://","--proxy-bypass-list=*","--disable-web-security","--ignore-certificate-errors"))
             assertEquals(1,args.count{it.startsWith("--proxy-server=")});assertTrue(args.any{it.startsWith("--proxy-server=socks5://127.0.0.1:")})
+            assertFalse("--disable-web-security" in args);assertFalse("--ignore-certificate-errors" in args)
             assertFalse(args.any{it.contains("direct://")});assertTrue("--proxy-bypass-list=<-loopback>" in args)
             assertTrue(args.any{it.startsWith("--host-resolver-rules=MAP * ~NOTFOUND")});assertTrue("--disable-quic" in args)
             assertTrue("--force-webrtc-ip-handling-policy=disable_non_proxied_udp" in args)

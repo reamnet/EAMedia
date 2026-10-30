@@ -46,6 +46,21 @@ public final class BrowserWorker {
         try { URI u=new URI(value);return value.length()<=2048 && u.getHost()!=null && u.getUserInfo()==null && ("http".equalsIgnoreCase(u.getScheme()) || "https".equalsIgnoreCase(u.getScheme())); }
         catch(Exception e){return false;}
     }
+    /** Challenge frames are browser infrastructure, not media players. Leave their APIs alone. */
+    public static final class CapturePolicy {
+        public static boolean allows(String url) {
+            if(url==null)return false;
+            try {
+                java.net.URI uri=java.net.URI.create(url);
+                String host=uri.getHost();if(host==null)return false;
+                host=host.toLowerCase(java.util.Locale.ROOT);
+                if(host.equals("challenges.cloudflare.com") || host.endsWith(".challenges.cloudflare.com"))return false;
+                String path=uri.getPath();
+                return path==null || !path.startsWith("/cdn-cgi/challenge-platform/");
+            }catch(IllegalArgumentException invalid){return false;}
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         if(args.length!=3)throw new IllegalArgumentException("Worker needs port, native directory and profile directory");
         // The token travels through stdin, never the process command line or log.
@@ -113,7 +128,7 @@ public final class BrowserWorker {
         });client.addMessageRouter(router);
         client.addLoadHandler(new CefLoadHandlerAdapter(){
             private String currentResume=resume;private boolean firstDocumentEnded;
-            private void install(CefFrame frame){frame.executeJavaScript("window.__eaTVResume="+currentResume+";\n"+capture,frame.getURL(),0);}
+            private void install(CefFrame frame){if(!CapturePolicy.allows(frame.getURL()))return;frame.executeJavaScript("window.__eaTVResume="+currentResume+";\n"+capture,frame.getURL(),0);}
             public void onLoadStart(CefBrowser b,CefFrame frame,CefRequest.TransitionType transition){
                 if(frame.isMain() && firstDocumentEnded)currentResume="{\"known\":false}";
                 install(frame);

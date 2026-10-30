@@ -41,7 +41,7 @@ internal class WebPeer(private val destination: WebDestination,private val send:
                         stream.pipe=pipe
                         if(stopped || stream.cancelled.get()){pipe.close();return@execute}
                         transferred=true;opened.incrementAndGet();send(WebMessage(WebMessage.READY,message.id));pipe.start()
-                    }catch(error: Exception){if(error is WebDomainDenied && deniedDomains.size<16 && deniedDomains.add(error.domain))denied(error.domain);stream.pipe?.close();reject(message.id)}finally{if(!transferred)release()}
+                    }catch(error: Exception){val target=when(error){is WebDomainDenied->error.domain;is WebPortDenied->"${error.host}:${error.port}";else->null};if(target!=null && deniedDomains.size<16 && deniedDomains.add(target))denied(target);stream.pipe?.close();reject(message.id)}finally{if(!transferred)release()}
                 }
             }catch(_: RejectedExecutionException){release();reject(message.id)}
             return
