@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Private jukebox playback fixture</title>
+<style>
+body{margin:0;background:#152a39;color:#e2f3f1;font:18px sans-serif}
+h2{position:absolute;left:470px;top:30px}
+video{position:absolute;left:20px;top:20px;width:426px;height:240px}
+button{position:absolute;left:340px;top:300px;width:160px;height:32px}
+pre{position:absolute;top:360px;left:20px;white-space:pre-wrap;font-size:13px;width:900px}
+</style>
+<video id="video" src="test.webm" loop controls playsinline preload="none"></video>
+<h2>Private music player<br><small>Select a track, then press Play.<br>Only audio is shared with speakers.</small></h2>
+<button id="button">Play selected track</button><pre id="state"></pre>
+<script>
+const video=document.querySelector('#video');let context,analyser,clicks=0;
+// An interactive music player creates its audio graph when the operator starts a track.
+document.querySelector('#button').onclick=()=>{
+ clicks++;
+ if(!context){context=new AudioContext();analyser=context.createAnalyser();analyser.fftSize=512;context.createMediaElementSource(video).connect(analyser);analyser.connect(context.destination)}
+ context.resume();video.play();
+};
+setInterval(()=>{
+ let rms=0;if(analyser){let samples=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(samples);rms=Math.sqrt(samples.reduce((s,x)=>s+x*x,0)/samples.length)}
+ document.querySelector('#state').textContent='ELN_JUKEBOX_STATE:'+JSON.stringify({time:video.currentTime,paused:video.paused,contextState:context?.state,rms,clicks})+':END';
+},100);
+</script>

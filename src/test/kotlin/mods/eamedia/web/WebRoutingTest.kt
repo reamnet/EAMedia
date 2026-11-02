@@ -189,7 +189,7 @@ class WebRoutingTest {
             }
         } as net.neoforged.neoforge.network.handling.IPayloadContext
         try {
-            WebRoutingNetwork.handle(WebPacket(WebMessage(WebMessage.STATUS,host="youtube.com",credit=1)),context)
+            WebRoutingNetwork.handle(WebPacket(WebMessage(WebMessage.STATUS,host=WebDomains(listOf("youtube.com")).wire(),credit=1)),context)
             assertTrue(BrowserWebProxy.client.enabled);assertTrue(BrowserWebProxy.client.domains.allows("www.youtube.com"))
         }finally{BrowserWebProxy.client.detach()}
     }

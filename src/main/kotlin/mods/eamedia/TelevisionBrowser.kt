@@ -64,7 +64,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         if(!isController)return
         if(type=="move") { val now=System.nanoTime();if(now-lastMove<33_000_000)return;lastMove=now }
         val value=com.google.gson.Gson().toJson(linkedMapOf<String,Any>("type" to type).apply { putAll(values) })
-        command(TelevisionCommand.INPUT,value)
+        if(render.kind==MediaKind.JUKEBOX && isHost)remoteInput(value,mc.player!!.uuid) else command(TelevisionCommand.INPUT,value)
     }
     fun remoteInput(value: String,controller: java.util.UUID) {
         if(!isHost || !TelevisionNetwork.validInput(value))return
@@ -144,7 +144,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
                 val initialPlayback=render.tvPlayback
                 fun install(frame: CefFrame) {
                     if(!mods.eamedia.server.BrowserWorker.CapturePolicy.allows(frame.url))return
-                    val s=if(frame.url==initialUrl)initialPlayback else TelevisionPlayback()
+                    val s=if(render.kind==MediaKind.TV && frame.url==initialUrl)initialPlayback else TelevisionPlayback()
                     val resume=com.google.gson.Gson().toJson(mapOf("position" to s.position,"paused" to s.paused,"rate" to s.rate,"known" to s.known))
                     frame.executeJavaScript("window.__eaTVRelayAudio=true;window.__eaTVResume=$resume;\n"+captureTemplate,frame.url.orEmpty(),0)
                 }
@@ -157,7 +157,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
                 c.addDisplayHandler(object: CefDisplayHandlerAdapter() {
                     override fun onAddressChange(b: CefBrowser,frame: CefFrame,url: String) {
                         if(!frame.isMain || TelevisionUrl.parse(url)==null)return
-                        mc.execute { if(b===browser && isHost && url!=render.mediaUrl && url!=pendingPage) { pendingPage=url;command(TelevisionCommand.PAGE_CHANGED,url) } }
+                        mc.execute { if(render.kind==MediaKind.TV && b===browser && isHost && url!=render.mediaUrl && url!=pendingPage) { pendingPage=url;command(TelevisionCommand.PAGE_CHANGED,url) } }
                     }
                 })
                 c.handle.addRequestHandler(object: CefRequestHandlerAdapter() {
@@ -180,7 +180,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
                     private var nextPaint=0L
                     override fun onPaint(b: CefBrowser,popup: Boolean,rects: Array<Rectangle>,buffer: ByteBuffer,width: Int,height: Int) {
                         if(!popup) {
-                            mirror.capture(buffer,width,height,if(showPopup)popupGraphics else null,if(showPopup)popupSize else null)
+                            if(render.kind==MediaKind.TV)mirror.capture(buffer,width,height,if(showPopup)popupGraphics else null,if(showPopup)popupSize else null)
                             val now=System.nanoTime();if(now<nextPaint)return
                             nextPaint=maxOf(nextPaint+1_000_000_000L/TelevisionStream.FPS,now);paintedFrames++
                             // A skipped dirty rectangle must be included on the next accepted frame.
@@ -199,9 +199,9 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         }
     }
 
-    private fun approvedPage()=TelevisionUrl.parse(render.mediaUrl)?.host?.let{mods.eamedia.web.BrowserWebProxy.client.domains.allows(it)} ?: false
+    private fun approvedPage()=TelevisionUrl.parse(render.mediaUrl)?.let{mods.eamedia.web.BrowserWebProxy.client.domains.allowsPage(it)} ?: false
     fun status(): String=when {
-        !render.mediaRequested->tr("Enter a webpage or video address and turn on the TV")
+        !render.mediaRequested->if(render.kind==MediaKind.JUKEBOX)tr("Enter a player address and press Play") else tr("Enter a webpage or video address and turn on the TV")
         !render.working->tr("Waiting for electrical power")
         !render.tvServerHosted && !mods.eamedia.web.BrowserWebProxy.client.enabled->if(mods.eamedia.web.BrowserWebProxy.client.connected)tr("The server has disabled TV web routing") else tr("Waiting for the server web route")
         !render.tvServerHosted && !approvedPage()->tr("This website is not approved by the server")
@@ -209,6 +209,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         render.tvServerHosted && render.tvServerStatus=="DISPLAY_MISSING"->tr("The server needs Xvfb for its browser; see server setup")
         render.tvServerHosted && render.tvServerStatus=="FAILED"->tr("Server browser failed; check its worker log")
         render.tvServerHosted && render.tvServerStatus=="CAPACITY"->tr("The server browser limit has been reached")
+        render.kind==MediaKind.JUKEBOX && !isHost->tr("Audio-only jukebox; the private browser belongs to its hosting player")
         !isHost && mirror.receivedFrames>0->if(isController)tr("Shared TV; you control the browser") else tr("Shared TV; take control to interact")
         !isHost->tr("Waiting for the shared TV picture")
         !MCEF.isInitialized()->tr("Browser engine unavailable; check MCEF setup")
@@ -216,7 +217,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
         capacity->tr("Two nearby TVs are already active")
         browser==null->tr("Waiting for viewer within 32 blocks")
         browser!!.isLoading->tr("Loading webpage...")
-        else->if(isController)tr("Shared TV; you control the browser") else tr("Shared TV; take control to interact")
+        else->if(render.kind==MediaKind.JUKEBOX)tr("Private controls; nearby listeners receive audio only") else if(isController)tr("Shared TV; you control the browser") else tr("Shared TV; take control to interact")
     }
     fun drawWorld()=TerrainModels.dynamic {
         val picture=texture() ?: return@dynamic
@@ -235,7 +236,7 @@ class TelevisionBrowser(private val render: MediaRender): AutoCloseable {
             } finally { UtilsClient.enableLight();GL11.glPopAttrib() }
         }
     }
-    fun texture()=if(isHost && browser!=null && paintedFrames>0)location else mirror.texture()
+    fun texture()=if(isHost && browser!=null && paintedFrames>0)location else if(render.kind==MediaKind.TV)mirror.texture() else null
     private fun closeBrowser() {
         focused=false
         releaseInputs();inputController=null

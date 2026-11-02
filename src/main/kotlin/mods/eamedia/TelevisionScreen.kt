@@ -16,7 +16,7 @@ import java.io.DataOutputStream
 import kotlin.math.min
 
 /** The same browser texture is interactive here and continues playing on the placed TV. */
-class TelevisionScreen(private val render: MediaRender): Screen(Component.literal(tr("Powered Browser Television"))) {
+class TelevisionScreen(private val render: MediaRender): Screen(Component.literal(if(render.kind==MediaKind.JUKEBOX)tr("Private jukebox browser - audio only") else tr("Powered Browser Television"))) {
     private val tv get()=render.television
     private lateinit var address: EditBox
     private lateinit var power: Button
@@ -37,8 +37,12 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
         button(64,8,50,tr("Reload")) { tv.command(TelevisionCommand.RELOAD) }
         address=addRenderableWidget(EditBox(font,118,8,(width-174).coerceAtLeast(60),20,Component.literal(tr("Web address"))).apply {
             setMaxLength(2048);value=render.mediaUrl
-            if(value.isBlank())value="https://www.youtube.com/"
+            if(value.isBlank())value=if(render.kind==MediaKind.JUKEBOX)"https://app.plex.tv/desktop/" else "https://www.youtube.com/"
         })
+        if(render.kind==MediaKind.JUKEBOX && width>=414) {
+            val plex=mods.eamedia.web.BrowserWebProxy.client.domains.plex.firstOrNull()
+            button(206,height-28,76,tr("Local Plex")) { address.value="http://$plex/web/";navigate() }.apply { active=plex!=null;tooltip=net.minecraft.client.gui.components.Tooltip.create(Component.literal(if(plex==null)tr("Ask the server owner to configure a local Plex server") else tr("Open the configured local Plex server"))) }
+        }
         button(width-48,8,40,tr("Go")) { navigate() }
         power=button(8,height-28,72,"") {
             if(render.mediaRequested)render.clientSendId(87) else navigate()
@@ -58,8 +62,8 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
     }
     private fun navigate() {
         val parsed=TelevisionUrl.parse(address.value)
-        error=parsed==null
-        if(parsed!=null) { tv.command(TelevisionCommand.NAVIGATE,parsed.toASCIIString());address.isFocused=false;pageFocus=true;tv.focused=true }
+        error=parsed==null || render.kind==MediaKind.JUKEBOX && (parsed.rawQuery!=null || parsed.rawFragment?.contains("token",true)==true)
+        if(parsed!=null && !error) { tv.command(TelevisionCommand.NAVIGATE,parsed.toASCIIString());address.isFocused=false;pageFocus=true;tv.focused=true }
     }
     private fun inside(x: Double,y: Double)=x>=pictureX && x<pictureX+pictureW && y>=pictureY && y<pictureY+pictureH
     private fun bx(x: Double)=((x-pictureX)*TelevisionBrowser.WIDTH/pictureW).toInt().coerceIn(0,TelevisionBrowser.WIDTH-1)
@@ -81,10 +85,10 @@ class TelevisionScreen(private val render: MediaRender): Screen(Component.litera
             b.addVertex(m,pictureX.toFloat(),pictureY.toFloat(),0f).setUv(0f,0f).setColor(-1)
             BufferUploader.drawWithShader(b.buildOrThrow())
         }
-        power.message=Component.literal(if(render.mediaRequested)tr("TV off") else tr("TV on"))
+        power.message=Component.literal(if(render.mediaRequested)tr("Stop") else tr("Play"))
         voltage.message=Component.literal(Utils.plotVolt("",render.settings[0]).trim());voltage.active=render.cord.endpoint==null
-        takeControl.message=Component.literal(if(tv.isController)tr("You control TV") else tr("Take control"));takeControl.active=!tv.isController
-        g.drawString(font,font.plainSubstrByWidth(if(error)tr("Use a complete HTTP or HTTPS address") else tv.status(),width-16),8,height-56,if(error)0xffff7777.toInt() else 0xffdddddd.toInt(),false)
+        takeControl.message=Component.literal(if(tv.isController)tr("Your controls") else tr("Take control"));takeControl.active=!tv.isController
+        g.drawString(font,font.plainSubstrByWidth(if(error) { if(render.kind==MediaKind.JUKEBOX)tr("Use the player home address; sign in inside the private browser") else tr("Use a complete HTTP or HTTPS address") } else tv.status(),width-16),8,height-56,if(error)0xffff7777.toInt() else 0xffdddddd.toInt(),false)
         g.drawString(font,font.plainSubstrByWidth(tr("Supply: %1$; %2$; volume %3$ percent",Utils.plotVolt("",render.stats[0]).trim(),Utils.plotPower("",render.stats[1]).trim(),(render.settings[1]*100).toInt()),width-16),8,height-44,0xffaaaaaa.toInt(),false)
         super.render(g,x,y,partial)
     }

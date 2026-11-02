@@ -26,36 +26,37 @@ import javax.net.ssl.HttpsURLConnection
 import javax.sound.sampled.AudioFormat
 
 /** Client-only I/O. Completed local files keep networking and transcoding off the render/audio threads. */
-class WebJukeboxAudio(private val render: MediaRender,private val tile: TransparentNodeEntity): AutoCloseable {
+class WebJukeboxAudio(private val source: JukeboxAudioSource): AutoCloseable {
     private var revision=Int.MIN_VALUE
     private var job: Job?=null
     private var muted=false
     fun update() {
-        val mc=Minecraft.getInstance();val p=mc.player
-        muted=render.settings[1]<=0 || mc.options.getSoundSourceVolume(SoundSource.RECORDS)<=0 || mc.options.getSoundSourceVolume(SoundSource.MASTER)<=0
-        val near=p!=null && p.distanceToSqr(tile.blockPos.x+.5,tile.blockPos.y+.5,tile.blockPos.z+.5)<=32.0*32.0
-        if(!render.working || !render.mediaRequested || !near || muted || tile.isRemoved) { close();return }
-        if(job==null || revision!=render.mediaRevision) {
-            close();revision=render.mediaRevision
-            val uri=WebAudioUrl.parse(render.mediaUrl) ?: return
-            job=Job(uri,render,tile).also { it.start() }
+        val mc=Minecraft.getInstance()
+        muted=mc.options.getSoundSourceVolume(SoundSource.RECORDS)<=0 || mc.options.getSoundSourceVolume(SoundSource.MASTER)<=0
+        if(!source.active || source.snapshot.browser || muted) { close();return }
+        if(job==null || revision!=source.snapshot.revision) {
+            close();revision=source.snapshot.revision
+            val uri=WebAudioUrl.parse(source.snapshot.url) ?: return
+            job=Job(uri,source).also { it.start() }
         }
+        job?.refreshSounds()
     }
     fun status(): String=when {
         muted->tr("Web audio muted; check volume / Records slider")
-        !render.mediaRequested->tr("Paste a HTTPS audio / YouTube link and press Play")
-        !render.working->tr("Waiting for electrical power")
-        else->job?.message() ?: tr("Waiting for listener within 32 blocks")
+        !source.snapshot.active->tr("Waiting for electrical power and playback")
+        source.snapshot.browser->tr("Private browser audio; nearby speakers share sound only")
+        else->job?.message() ?: tr("Waiting for listener within 32 blocks of a speaker")
     }
     override fun close() { job?.close();job=null }
 
-    private class Job(val uri: URI,val render: MediaRender,val tile: TransparentNodeEntity): AutoCloseable {
+    private class Job(val uri: URI,val source: JukeboxAudioSource): AutoCloseable {
         private val cancelled=AtomicBoolean()
         @Volatile var state=0
         @Volatile private var process: Process?=null
         @Volatile private var network: InputStream?=null
         @Volatile private var audio: AudioStream?=null
-        @Volatile private var sound: WebSound?=null
+        private val sounds=HashMap<net.minecraft.core.BlockPos,WebSound>()
+        private var fanout: PcmFanout?=null
         @Volatile private var directory: Path?=null
         private var future: Future<*>?=null
         fun message()=when(state) {
@@ -96,11 +97,11 @@ class WebJukeboxAudio(private val render: MediaRender,private val tile: Transpar
                     }
                     if(cancelled.get())return@submit
                     val decoded=LocalMonoStream(JOrbisAudioStream(Files.newInputStream(ready)),{ state=4 },{ cleanup() })
-                    audio=decoded
+                    audio=decoded;fanout=PcmFanout(decoded)
                     if(cancelled.get()) { decoded.close();return@submit }
                     Minecraft.getInstance().execute {
                         if(cancelled.get())decoded.close() else {
-                            state=3;val instance=WebSound(this);sound=instance;Minecraft.getInstance().soundManager.play(instance)
+                            state=3;refreshSounds()
                         }
                     }
                 } catch(_: CancellationException) {
@@ -157,7 +158,13 @@ class WebJukeboxAudio(private val render: MediaRender,private val tile: Transpar
                 } finally { conn.disconnect() }
             }
         }
-        fun audioStream(): AudioStream=audio ?: throw IllegalStateException("Audio not prepared")
+        fun audioStream(): AudioStream=fanout?.reader() ?: throw IllegalStateException("Audio not prepared")
+        fun refreshSounds() {
+            if(state!=3)return
+            val mc=Minecraft.getInstance()
+            sounds.entries.removeIf { (pos,s)->if(pos !in source.endpoints) { mc.soundManager.stop(s);true } else false }
+            source.endpoints.keys.filter { it !in sounds }.forEach { at->val s=WebSound(this,at);sounds[at]=s;mc.soundManager.play(s) }
+        }
         private fun cleanup() {
             synchronized(active) { active.remove(this) }
             val dir=directory ?: return
@@ -166,9 +173,9 @@ class WebJukeboxAudio(private val render: MediaRender,private val tile: Transpar
         }
         override fun close() {
             if(!cancelled.compareAndSet(false,true))return
-            sound?.let { Minecraft.getInstance().soundManager.stop(it) };process?.destroyForcibly()
+            sounds.values.forEach { Minecraft.getInstance().soundManager.stop(it) };sounds.clear();process?.destroyForcibly()
             try { network?.close() }catch(_: IOException) { }
-            future?.cancel(true);try { audio?.close() }catch(_: IOException) { }
+            future?.cancel(true);try { fanout?.close();audio?.close() }catch(_: IOException) { }
             cleanup()
         }
         private fun tool(key: String,name: String): String {
@@ -176,14 +183,14 @@ class WebJukeboxAudio(private val render: MediaRender,private val tile: Transpar
             return override.ifBlank { runtime.resolve(name).toString() }
         }
     }
-    private class WebSound(private val job: Job): AbstractTickableSoundInstance(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("eln","web_jukebox_audio")),SoundSource.RECORDS,SoundInstance.createUnseededRandom()) {
-        init { x=job.tile.blockPos.x+.5;y=job.tile.blockPos.y+.5;z=job.tile.blockPos.z+.5;volume=job.render.settings[1].toFloat() }
+    private class WebSound(private val job: Job,private val at: net.minecraft.core.BlockPos): AbstractTickableSoundInstance(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("eln","web_jukebox_audio")),SoundSource.RECORDS,SoundInstance.createUnseededRandom()) {
+        init { x=at.x+.5;y=at.y+.5;z=at.z+.5;volume=job.source.endpoints[at] ?: 0f }
         override fun resolve(manager: SoundManager): WeighedSoundEvents {
             sound=Sound(location,ConstantFloat.of(1f),ConstantFloat.of(1f),1,Sound.Type.FILE,true,false,32)
             return WeighedSoundEvents(location,null).also { it.addSound(sound) }
         }
         override fun getStream(library: SoundBufferLibrary,sound: Sound,looping: Boolean): CompletableFuture<AudioStream> = CompletableFuture.completedFuture(job.audioStream())
-        override fun tick() { volume=job.render.settings[1].toFloat();if(job.state!=3 || job.tile.isRemoved || !job.render.working)stop() }
+        override fun tick() { volume=job.source.endpoints[at] ?: 0f;if(job.state !in 3..4 || !job.source.active || at !in job.source.endpoints)stop() }
     }
     /** Vorbis stereo is mixed locally to mono so OpenAL correctly attenuates the block sound. */
     internal class LocalMonoStream(private val delegate: AudioStream,private val ended: ()->Unit,private val cleanup: ()->Unit): AudioStream {

@@ -29,8 +29,11 @@ import javax.imageio.stream.MemoryCacheImageInputStream
 import javax.sound.sampled.AudioFormat
 
 object TelevisionMirrorClient {
-    private fun render(pos: net.minecraft.core.BlockPos)=((Minecraft.getInstance().level?.getBlockEntity(pos) as? TransparentNodeEntity)?.elementRender as? MediaRender)?.takeIf { it.kind==MediaKind.TV }
-    fun receive(packet: TelevisionStream) { render(packet.pos)?.television?.mirror?.receive(packet) }
+    private fun render(pos: net.minecraft.core.BlockPos)=((Minecraft.getInstance().level?.getBlockEntity(pos) as? TransparentNodeEntity)?.elementRender as? MediaRender)?.takeIf { it.usesBrowser }
+    fun receive(packet: TelevisionStream) {
+        val r=render(packet.pos)
+        if(r?.kind==MediaKind.TV)r.television.mirror.receive(packet) else JukeboxAudioClient.receive(packet)
+    }
     fun input(packet: TelevisionHostInput) {
         val r=render(packet.pos) ?: return
         if(r.tvSession!=packet.session || r.tvHostEpoch!=packet.epoch || r.mediaRevision!=packet.revision || r.tvHost!=Minecraft.getInstance().player?.uuid)return
@@ -73,6 +76,7 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
     }
     private fun current(s: Stamp)=stamp==s && render.working && !render.tileEntity.isRemoved
     fun capture(buffer: ByteBuffer,width: Int,height: Int,popup: ByteBuffer?=null,bounds: java.awt.Rectangle?=null) {
+        if(render.kind==MediaKind.JUKEBOX)return
         val s=stamp ?: return
         val now=System.nanoTime()
         if(!hosting || width!=TelevisionStream.WIDTH || height!=TelevisionStream.HEIGHT || now<nextCapture || !encoding.compareAndSet(false,true))return
@@ -109,7 +113,10 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
             } catch(_: Exception) { encoding.set(false) }
         }
     }
+    private val captureCalls=AtomicLong()
+    internal fun audioDebug()="hosting=$hosting calls=${captureCalls.get()} sources=${mixer.sourceCount()} sent=${audioSequence.get()}"
     fun captureAudio(source: Long,value: String) {
+        captureCalls.incrementAndGet()
         if(!hosting || value.length>11000)return
         val bytes=try { Base64.getDecoder().decode(value) }catch(_: IllegalArgumentException){return}
         mixer.offer(source,bytes)
@@ -126,6 +133,7 @@ class TelevisionMirror(private val render: MediaRender): AutoCloseable {
     }
     fun stopCapture(){mixer.clear();audioClock.reset();nextCapture=0}
     fun receive(packet: TelevisionStream) {
+        if(render.kind==MediaKind.JUKEBOX) { JukeboxAudioClient.receive(packet);return }
         val s=stamp ?: return
         if(packet.session!=s.session || packet.epoch!=s.epoch || packet.revision!=s.revision || !current(s))return
         if(packet.kind==TelevisionStream.AUDIO) {

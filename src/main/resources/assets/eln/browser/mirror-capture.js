@@ -10,7 +10,8 @@
     };
     const attached = new WeakSet(), inGraph = new WeakSet(), buses = new WeakMap(), elementGains = new WeakMap();
     const speakerSinks = new WeakMap(), elementSpeakers = new WeakMap();
-    let context, processor;
+    let context, processor, captureFrames = 0, lastEnergy = 0, capturePackets = 0;
+    window.__eaTVAudioDiagnostics = () => ({state: context?.state, frames: captureFrames, energy: lastEnergy, packets: capturePackets});
     const audio = () => {
         if (context) return context;
         context = new AudioContext({sampleRate: 24000});
@@ -28,7 +29,8 @@
                 energy += l * l + r * r;
             }
             // Empty/silent documents generate no network sound traffic.
-            if (energy > .000001) send('pcm:' + btoa(String.fromCharCode(...bytes)));
+            captureFrames += count; lastEnergy = energy;
+            if (energy > .000001) { capturePackets++; send('pcm:' + btoa(String.fromCharCode(...bytes))); }
         };
         context.resume().catch(() => {});
         return context;
@@ -85,6 +87,9 @@
     const resumed = new WeakSet();
     const update = () => {
         const media = Array.from(document.querySelectorAll('video,audio'));
+        // A player may grant autoplay only after clicking its Play control. Retry that
+        // suspended capture context after playback begins, including playlist changes.
+        if (context?.state === 'suspended' && media.some(m => !m.paused)) context.resume().catch(() => {});
         media.forEach(m => {
             if (window.__eaTVRelayAudio && !attached.has(m) && !inGraph.has(m) && m.readyState >= 2) {
                 try {

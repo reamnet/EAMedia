@@ -17,6 +17,7 @@ object TelevisionHosting {
 }
 
 class SharedTelevision(val serverHosted: Boolean=TelevisionHosting.serverHosted,private val clock: ()->Long={ System.nanoTime()/1_000_000 }) {
+    var privateHost=false
     /** Replaced on every element load, preventing delayed controls from reaching a replacement TV. */
     val session=UUID.randomUUID()
     private var playback=TelevisionPlayback()
@@ -50,12 +51,17 @@ class SharedTelevision(val serverHosted: Boolean=TelevisionHosting.serverHosted,
         if(!interactive) {
             viewers.entries.removeIf { it.value<=now };viewers[player]=now+LEASE_MILLIS
             if(!serverHosted) {
-                if(host==null) { hostId=player;hostUntil=now+HOST_LEASE_MILLIS;hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1 }
+                if(host==null && !privateHost) { hostId=player;hostUntil=now+HOST_LEASE_MILLIS;hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1 }
                 else if(hostId==player)hostUntil=now+HOST_LEASE_MILLIS
             }
             return true
         }
+        if(privateHost && host!=null && host!=player)return false
         if(controller!=null && controller!=player)return false
+        if(privateHost && !serverHosted) {
+            if(host!=player) { hostEpoch=UUID.randomUUID();lastReport=Long.MIN_VALUE;sequence=-1 }
+            hostId=player;hostUntil=now+HOST_LEASE_MILLIS;viewers[player]=now+LEASE_MILLIS
+        }
         owner=player;ownerUntil=now+LEASE_MILLIS
         return true
     }

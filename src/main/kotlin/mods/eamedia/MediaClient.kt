@@ -69,10 +69,13 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
     var tvPlayback=TelevisionPlayback();var tvSampleNanos=0L;var tvBack=false;var tvForward=false
     var tvServerStatus="OFF"
     var tvServerHosted=false
-    val webAudio by lazy { WebJukeboxAudio(this,tileEntity) }
+    var speakerChannel=1;var browserMode=false
+    val usesBrowser get()=kind==MediaKind.TV || browserMode
+    val webAudio get()=JukeboxAudioClient.audio(this)
+    private var hadBrowser=false
     val television by lazy { TelevisionBrowser(this) }
-    override fun refresh(deltaT: Float) { super.refresh(deltaT);if(kind==MediaKind.TV)television.update() else webAudio.update() }
-    override fun destructor() { if(kind==MediaKind.TV)television.close() else webAudio.close();super.destructor() }
+    override fun refresh(deltaT: Float) { super.refresh(deltaT);if(kind==MediaKind.JUKEBOX)JukeboxAudioClient.register(this);if(usesBrowser) { hadBrowser=true;television.update() } else if(hadBrowser) { hadBrowser=false;television.close() } }
+    override fun destructor() { television.close();JukeboxAudioClient.remove(this);super.destructor() }
     override fun draw() {
         TerrainModels.body(this,listOf(front),setOf("Indicator")) { (transparentNodeDescriptor as MediaDescriptor).draw(front ?: Direction.ZP,working) }
         if(kind==MediaKind.TV && !TerrainModels.isDiscovering)television.drawWorld()
@@ -80,7 +83,8 @@ class MediaRender(entity: TransparentNodeEntity,descriptor: TransparentNodeDescr
     override fun networkUnserialize(input: DataInputStream) {
         super.networkUnserialize(input);settings.indices.forEach { settings[it]=input.readDouble() };enabled=input.readBoolean();trip=input.readBoolean();working=input.readBoolean()
         stats.indices.forEach { stats[it]=input.readDouble() };mediaUrl=input.readUTF();mediaRequested=input.readBoolean();mediaRevision=input.readInt()
-        if(kind==MediaKind.TV) {
+        speakerChannel=input.readInt();browserMode=input.readBoolean()
+        run {
             tvSession=java.util.UUID.fromString(input.readUTF());tvController=input.readUTF().takeIf { it.isNotBlank() }?.let(java.util.UUID::fromString);tvInteractive=input.readBoolean()
             tvHost=input.readUTF().takeIf { it.isNotBlank() }?.let(java.util.UUID::fromString);tvHostEpoch=java.util.UUID.fromString(input.readUTF())
             tvPlayback=TelevisionPlayback(input.readDouble(),input.readBoolean(),input.readDouble(),input.readDouble(),input.readBoolean(),input.readBoolean());tvSampleNanos=System.nanoTime()

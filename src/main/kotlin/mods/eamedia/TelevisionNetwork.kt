@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.neoforged.neoforge.network.PacketDistributor
 import java.util.UUID
 
-data class TelevisionCommand(val pos: BlockPos,val session: UUID,val revision: Int,val action: Int,val value: String="",val sequence: Long=0): CustomPacketPayload {
+data class TelevisionCommand(val pos: BlockPos,val session: UUID,val revision: Int,val action: Int,val value: String="",val sequence: Long=0,val endpoint: BlockPos?=null): CustomPacketPayload {
     override fun type()=TYPE
     companion object {
         const val CLAIM=0;const val RELEASE=1;const val NAVIGATE=2;const val REPORT=3
@@ -20,8 +20,8 @@ data class TelevisionCommand(val pos: BlockPos,val session: UUID,val revision: I
         const val INPUT=9;const val LEAVE=10
         val TYPE=CustomPacketPayload.Type<TelevisionCommand>(ResourceLocation.fromNamespaceAndPath("eamedia","television_control"))
         val CODEC: StreamCodec<RegistryFriendlyByteBuf,TelevisionCommand> = StreamCodec.of({ b,p->
-            b.writeBlockPos(p.pos);b.writeUUID(p.session);b.writeVarInt(p.revision);b.writeByte(p.action);b.writeUtf(p.value,4096);b.writeVarLong(p.sequence)
-        },{ b->TelevisionCommand(b.readBlockPos(),b.readUUID(),b.readVarInt(),b.readUnsignedByte().toInt(),b.readUtf(4096),b.readVarLong()) })
+            b.writeBlockPos(p.pos);b.writeUUID(p.session);b.writeVarInt(p.revision);b.writeByte(p.action);b.writeUtf(p.value,4096);b.writeVarLong(p.sequence);b.writeBoolean(p.endpoint!=null);p.endpoint?.let(b::writeBlockPos)
+        },{ b->TelevisionCommand(b.readBlockPos(),b.readUUID(),b.readVarInt(),b.readUnsignedByte().toInt(),b.readUtf(4096),b.readVarLong(),if(b.readBoolean())b.readBlockPos() else null) })
     }
 }
 
@@ -30,11 +30,13 @@ object TelevisionNetwork {
     fun handle(player: ServerPlayer,packet: TelevisionCommand) {
         val world=player.serverLevel();val p=packet.pos
         val background=packet.action in listOf(TelevisionCommand.OBSERVE,TelevisionCommand.REPORT,TelevisionCommand.PAGE_CHANGED,TelevisionCommand.LEAVE)
-        if(!world.hasChunkAt(p) || packet.action!=TelevisionCommand.LEAVE && player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>if(background)1024.0 else 64.0)return
+        if(!world.hasChunkAt(p))return
         val node=(world.getBlockEntity(p) as? TransparentNodeEntity)?.node as? TransparentNode ?: return
         val tv=node.element as? MediaElement ?: return
-        if(tv.kind!=MediaKind.TV || packet.session!=tv.sharedTv.session || packet.revision!=tv.mediaRevision)return
+        if(packet.session!=tv.sharedTv.session || packet.revision!=tv.mediaRevision)return
         val shared=tv.sharedTv
+        val audible=tv.kind==MediaKind.JUKEBOX && packet.action==TelevisionCommand.OBSERVE && SpeakerLinks.canHear(player,tv,packet.endpoint)
+        if(!audible && packet.action!=TelevisionCommand.LEAVE && player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>if(background)1024.0 else 64.0)return
         when(packet.action) {
             TelevisionCommand.CLAIM->if(shared.claim(player.uuid,true))tv.needPublish()
             TelevisionCommand.OBSERVE->if(tv.working) {
@@ -45,18 +47,20 @@ object TelevisionNetwork {
                     if(host==null || host.serverLevel()!==world || host.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)shared.leave(id)
                 }
                 val fresh=player.uuid !in shared.activeViewers
-                shared.claim(player.uuid,false);mods.eamedia.web.WebRoutingNetwork.observe(player,tv);ServerTelevisions.observe(tv,world,p);tv.mirrorRelay.reset(shared.session,shared.hostEpoch,tv.mediaRevision);tv.needPublish()
-                if(fresh && shared.host!=player.uuid)tv.mirrorRelay.cached.forEach { PacketDistributor.sendToPlayer(player,it) }
+                if(tv.kind==MediaKind.JUKEBOX)tv.audioListeners[player.uuid]=packet.endpoint ?: p
+                shared.claim(player.uuid,false);mods.eamedia.web.WebRoutingNetwork.observe(player,tv);if(tv.kind==MediaKind.TV)ServerTelevisions.observe(tv,world,p);tv.mirrorRelay.reset(shared.session,shared.hostEpoch,tv.mediaRevision);tv.needPublish()
+                if(tv.kind==MediaKind.TV && fresh && shared.host!=player.uuid)tv.mirrorRelay.cached.forEach { PacketDistributor.sendToPlayer(player,it) }
             }
             TelevisionCommand.RELEASE->{ shared.release(player.uuid);tv.needPublish() }
             TelevisionCommand.LEAVE->{ val host=shared.host==player.uuid;shared.leave(player.uuid);if(host)mods.eamedia.web.WebRoutingNetwork.revoke(shared.session);tv.needPublish() }
-            TelevisionCommand.NAVIGATE->if(packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null && shared.claim(player.uuid,true))tv.playMedia(packet.value)
+            TelevisionCommand.NAVIGATE->if(packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null && shared.claim(player.uuid,true))tv.playBrowser(packet.value)
             TelevisionCommand.BACK,TelevisionCommand.FORWARD,TelevisionCommand.RELOAD->if(shared.claim(player.uuid,true)) {
                 if(shared.serverHosted)tv.navigateHistory(packet.action)
                 else forwardInput(tv,player,p,when(packet.action){TelevisionCommand.BACK->"{\"type\":\"back\"}";TelevisionCommand.FORWARD->"{\"type\":\"forward\"}";else->"{\"type\":\"reload\"}"})
             }
-            TelevisionCommand.PAGE_CHANGED->if(!shared.serverHosted && tv.working && shared.host==player.uuid && packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null)tv.browserPageChanged(packet.value)
+            TelevisionCommand.PAGE_CHANGED->if(tv.kind==MediaKind.TV && !shared.serverHosted && tv.working && shared.host==player.uuid && packet.value.length<=2048 && TelevisionUrl.parse(packet.value)!=null)tv.browserPageChanged(packet.value)
             TelevisionCommand.INPUT->{
+                if(tv.kind==MediaKind.JUKEBOX && shared.host!=player.uuid)return
                 if(!tv.working || shared.controller!=player.uuid || !tv.mirrorRelay.inputBudget.accept(1) || !validInput(packet.value))return
                 if(shared.serverHosted)ServerTelevisions.input(tv,packet.value) else forwardInput(tv,player,p,packet.value)
             }
@@ -79,10 +83,11 @@ object TelevisionNetwork {
         if(!world.hasChunkAt(p) || player.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024)return
         val tv=((world.getBlockEntity(p) as? TransparentNodeEntity)?.node as? TransparentNode)?.element as? MediaElement ?: return
         val shared=tv.sharedTv
-        if(tv.kind!=MediaKind.TV || shared.serverHosted || !tv.working || shared.host!=player.uuid || packet.session!=shared.session || packet.epoch!=shared.hostEpoch || packet.revision!=tv.mediaRevision || packet.sequence<0)return
+        if(!tv.usesBrowser || shared.serverHosted || !tv.working || shared.host!=player.uuid || packet.session!=shared.session || packet.epoch!=shared.hostEpoch || packet.revision!=tv.mediaRevision || packet.sequence<0)return
         val relay=tv.mirrorRelay;relay.reset(shared.session,shared.hostEpoch,tv.mediaRevision)
         val packets=when(packet.kind) {
             TelevisionStream.VIDEO->{
+                if(tv.kind==MediaKind.JUKEBOX)return
                 if(!relay.videoBudget.accept(packet.bytes.size))return
                 val jpeg=relay.video.accept(packet) ?: return
                 if(jpeg.size<4 || jpeg[0]!=0xff.toByte() || jpeg[1]!=0xd8.toByte())return
@@ -97,7 +102,7 @@ object TelevisionNetwork {
         for(id in shared.activeViewers) {
             if(id==player.uuid)continue
             val watcher=world.server.playerList.getPlayer(id) ?: continue
-            if(watcher.serverLevel()!==world || watcher.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024) { shared.leave(id);continue }
+            if(watcher.serverLevel()!==world || if(tv.kind==MediaKind.JUKEBOX)!SpeakerLinks.canHear(watcher,tv,tv.audioListeners[id]) else watcher.distanceToSqr(p.x+.5,p.y+.5,p.z+.5)>1024) { shared.leave(id);continue }
             packets.forEach { PacketDistributor.sendToPlayer(watcher,it) }
         }
     }

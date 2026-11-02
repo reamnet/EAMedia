@@ -34,7 +34,7 @@ data class WebPacket(val message: WebMessage): CustomPacketPayload {
                 WebMessage.OPEN->{b.writeUtf(m.host,253);b.writeShort(m.port)}
                 WebMessage.DATA->{require(m.bytes.size in 1..WebMessage.CHUNK);b.writeByteArray(m.bytes)}
                 WebMessage.CREDIT->{require(m.credit in 1..WebMessage.WINDOW);b.writeVarInt(m.credit)}
-                WebMessage.STATUS->{b.writeBoolean(m.credit==1);b.writeUtf(m.host,8192)}
+                WebMessage.STATUS->{b.writeBoolean(m.credit==1);b.writeUtf(m.host,16384)}
                 WebMessage.READY,WebMessage.END,WebMessage.CLOSE->Unit
                 else->throw IllegalArgumentException("Unknown web route packet")
             }
@@ -44,7 +44,7 @@ data class WebPacket(val message: WebMessage): CustomPacketPayload {
                 WebMessage.OPEN->WebMessage(kind,id,b.readUtf(253),b.readUnsignedShort())
                 WebMessage.DATA->WebMessage(kind,id,bytes=b.readByteArray(WebMessage.CHUNK).also{require(it.isNotEmpty())})
                 WebMessage.CREDIT->WebMessage(kind,id,credit=b.readVarInt().also{require(it in 1..WebMessage.WINDOW)})
-                WebMessage.STATUS->{val enabled=b.readBoolean();WebMessage(kind,id,host=b.readUtf(8192),credit=if(enabled)1 else 0)}
+                WebMessage.STATUS->{val enabled=b.readBoolean();WebMessage(kind,id,host=b.readUtf(16384),credit=if(enabled)1 else 0)}
                 WebMessage.READY,WebMessage.END,WebMessage.CLOSE->WebMessage(kind,id)
                 else->throw IllegalArgumentException("Unknown web route packet")
             })
@@ -61,7 +61,7 @@ object WebRoutingNetwork {
     @Volatile private var running=false
     @Volatile private var domains=WebDomains(emptyList())
     @Volatile private var enabled=false
-    private val allowLoopback get()=java.lang.Boolean.getBoolean("eamedia.mirrorServer") && java.lang.Boolean.getBoolean("eamedia.webTestLoopback")
+    private val allowLoopback get()=(java.lang.Boolean.getBoolean("eamedia.mirrorServer") || java.lang.Boolean.getBoolean("eamedia.jukeboxSpeakerChecks")) && java.lang.Boolean.getBoolean("eamedia.webTestLoopback")
     @SubscribeEvent fun start(e: ServerStartedEvent) {
         try {
             domains=WebDomains.load(Path.of("config/eamedia-web-domains.txt"));enabled=System.getProperty("eamedia.webRouting","true").toBoolean()
@@ -73,10 +73,10 @@ object WebRoutingNetwork {
     @SubscribeEvent fun login(e: PlayerEvent.PlayerLoggedInEvent) {
         val player=e.entity as? ServerPlayer ?: return
         authenticated[player.uuid]=player.connection.connection
-        PacketDistributor.sendToPlayer(player,WebPacket(WebMessage(WebMessage.STATUS,host=domains.entries.joinToString(","),credit=if(enabled)1 else 0)))
+        PacketDistributor.sendToPlayer(player,WebPacket(WebMessage(WebMessage.STATUS,host=domains.wire(),credit=if(enabled)1 else 0)))
     }
     fun observe(player: ServerPlayer,tv: MediaElement) {
-        if(!enabled || !tv.working || tv.sharedTv.serverHosted || tv.sharedTv.host!=player.uuid)return
+        if(!enabled || !tv.usesBrowser || !tv.working || tv.sharedTv.serverHosted || tv.sharedTv.host!=player.uuid)return
         grants.touch(tv.sharedTv.session,player.connection.connection)?.let(::closeIfNotHosting)
     }
     fun revoke(session: UUID){grants.revoke(session)?.let(::closeIfNotHosting)}
@@ -96,7 +96,7 @@ object WebRoutingNetwork {
         // Direction is available during that transition; player() is not.
         if(context.flow()==net.minecraft.network.protocol.PacketFlow.CLIENTBOUND) {
             val connection=context.connection()
-            if(message.kind==WebMessage.STATUS)BrowserWebProxy.client.attach(connection,{connection.send(ServerboundCustomPayloadPacket(WebPacket(it)))},message.credit==1,WebDomains(message.host.split(',')))
+            if(message.kind==WebMessage.STATUS)BrowserWebProxy.client.attach(connection,{connection.send(ServerboundCustomPayloadPacket(WebPacket(it)))},message.credit==1,WebDomains.fromWire(message.host))
             else BrowserWebProxy.client.receive(connection,message)
             return
         }

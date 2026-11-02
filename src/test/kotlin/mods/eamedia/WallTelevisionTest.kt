@@ -11,16 +11,16 @@ class WallTelevisionTest {
     @Test fun separateSaveIdKeepsExistingTelevisionsAndJukeboxesUnchanged() {
         val factory=MediaAddon()
         assertTrue(factory.supportsWallTelevision())
-        val wall=factory.descriptor(ReservedMediaDevice.WALL_TV)
+        val wall=(factory.descriptor(ReservedMediaDevice.WALL_TV) as MediaDescriptor)
         assertTrue(wall.wallMounted);assertEquals(MediaKind.TV,wall.kind)
-        assertFalse(factory.descriptor(ReservedMediaDevice.TV).wallMounted)
+        assertFalse((factory.descriptor(ReservedMediaDevice.TV) as MediaDescriptor).wallMounted)
         assertEquals((126 shl 6)+9,ReservedMediaDevice.JUKEBOX.legacyId)
         assertEquals((126 shl 6)+10,ReservedMediaDevice.TV.legacyId)
         assertEquals((126 shl 6)+11,ReservedMediaDevice.WALL_TV.legacyId)
         assertEquals(960,TelevisionStream.WIDTH);assertEquals(540,TelevisionStream.HEIGHT)
     }
     @Test fun screenFitsWallModelAndSharesTheSamePowerAndBrowserSettings() {
-        val d=MediaAddon().descriptor(ReservedMediaDevice.WALL_TV)
+        val d=(MediaAddon().descriptor(ReservedMediaDevice.WALL_TV) as MediaDescriptor)
         assertFalse(d.mustHaveFloor());assertTrue(d.mustHaveWallFrontInverse())
         assertNotNull(d.checkCanPlace(null,Direction.YP))
         val model=Obj3D().apply { assertTrue(loadFile("${d.modelName}/${d.modelName}.obj")) }
@@ -34,7 +34,7 @@ class WallTelevisionTest {
         assertEquals(150.0,d.kind.watts)
     }
     @Test fun wallPowerTerminalsFollowTheWallAtEveryHorizontalRotation() {
-        val descriptor=MediaAddon().descriptor(ReservedMediaDevice.WALL_TV)
+        val descriptor=(MediaAddon().descriptor(ReservedMediaDevice.WALL_TV) as MediaDescriptor)
         for(front in listOf(Direction.XN,Direction.XP,Direction.ZN,Direction.ZP)) {
             val e=MediaElement(mods.eln.node.transparent.TransparentNode(),descriptor);e.front=front
             for(side in listOf(front.left(),Direction.YN)) {

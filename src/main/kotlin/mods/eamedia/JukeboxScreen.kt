@@ -20,8 +20,12 @@ class JukeboxScreen(private val render: MediaRender): Screen(Component.literal(t
     override fun isPauseScreen()=false
     override fun renderBackground(g: GuiGraphics,x: Int,y: Int,partial: Float) { }
     override fun init() {
-        left=(width-304)/2;top=(height-174)/2
+        left=(width-304)/2;top=(height-230)/2
         fun button(x: Int,y: Int,w: Int,label: String,action: ()->Unit)=addRenderableWidget(Button.builder(Component.literal(label)) { action() }.bounds(left+x,top+y,w,20).build())
+        button(8,174,140,tr("Private Plex / web player")) { render.television.command(TelevisionCommand.NAVIGATE,"https://app.plex.tv/desktop/");minecraft?.setScreen(TelevisionScreen(render)) }
+        button(156,174,140,tr("Open browser controls")) { minecraft?.setScreen(TelevisionScreen(render)) }
+        val channel=addRenderableWidget(EditBox(font,left+8,top+202,140,20,Component.literal(tr("Speaker channel"))).apply { setMaxLength(4);value=render.speakerChannel.toString() })
+        button(156,202,140,tr("Set speaker channel")) { channel.value.toIntOrNull()?.takeIf { it in 1..9999 }?.let { render.clientSendInt(88,it) } }
         address=addRenderableWidget(EditBox(font,left+8,top+32,288,20,Component.literal(tr("HTTPS audio or YouTube address"))).apply { setMaxLength(2048);value=render.mediaUrl })
         button(8,58,140,tr("Play / restart")) { play() };button(156,58,140,tr("Stop")) { render.clientSendId(87) }
         voltage=button(8,84,68,"") { settings(if(render.settings[0]==120.0)240.0 else 120.0,render.settings[1]) }
@@ -43,7 +47,7 @@ class JukeboxScreen(private val render: MediaRender): Screen(Component.literal(t
         if(p==null || render.tileEntity.isRemoved || p.distanceToSqr(render.tileEntity.blockPos.x+.5,render.tileEntity.blockPos.y+.5,render.tileEntity.blockPos.z+.5)>64)onClose()
     }
     override fun render(g: GuiGraphics,x: Int,y: Int,partial: Float) {
-        g.fill(0,0,width,height,0xc014171c.toInt());g.fill(left,top,left+304,top+174,0xff242a33.toInt())
+        g.fill(0,0,width,height,0xc014171c.toInt());g.fill(left,top,left+304,top+230,0xff242a33.toInt())
         g.drawString(font,title,left+8,top+10,-1,false)
         voltage.message=Component.literal(Utils.plotVolt("",render.settings[0]).trim());voltage.active=render.cord.endpoint==null
         enabled.message=Component.literal(if(render.enabled)tr("Disable") else tr("Enable"))

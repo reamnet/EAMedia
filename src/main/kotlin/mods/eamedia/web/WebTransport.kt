@@ -120,10 +120,11 @@ internal class WebDestination(private val domains: WebDomains=WebDomains(WebDoma
     data class Address(val host: String,val port: Int,val addresses: List<InetAddress>)
     fun resolve(host: String,port: Int): Address {
         require(host.length in 1..253 && host.all{it.isLetterOrDigit() && it.code<128 || it in ".-:"}){"Invalid website address"}
-        if(!domains.allows(host))throw WebDomainDenied(host)
+        val plex=domains.allowsPlex(host,port)
+        if(!plex && !domains.allows(host))throw WebDomainDenied(host)
         val addresses=resolver(host).toList();require(addresses.isNotEmpty())
-        require(addresses.all { publicAddress(it) || allowTestLoopback && it.isLoopbackAddress }){"Website address is not public"}
-        if(port !in ports && !(allowTestLoopback && port in 1..65535 && addresses.all{it.isLoopbackAddress}))throw WebPortDenied(host,port)
+        require(addresses.all { publicAddress(it) || allowTestLoopback && it.isLoopbackAddress || plex && !it.isAnyLocalAddress && !it.isLinkLocalAddress && !it.isMulticastAddress && (it.isSiteLocalAddress || it.isLoopbackAddress || it.address.size==16 && (it.address[0].toInt() and 254)==252) }){"Website address is not public"}
+        if(!plex && port !in ports && !(allowTestLoopback && port in 1..65535 && addresses.all{it.isLoopbackAddress}))throw WebPortDenied(host,port)
         return Address(host,port,addresses)
     }
     companion object {

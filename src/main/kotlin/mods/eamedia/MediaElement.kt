@@ -29,7 +29,11 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     var mediaRequested=false;private set
     var mediaRevision=0;private set
     var lifetimeJoules=0.0;private set
-    val sharedTv=SharedTelevision()
+    var speakerChannel=1;private set
+    var browserMode=false;private set
+    val usesBrowser get()=kind==MediaKind.TV || browserMode
+    val sharedTv=SharedTelevision(serverHosted=kind==MediaKind.TV && TelevisionHosting.serverHosted).apply { privateHost=kind==MediaKind.JUKEBOX }
+    val audioListeners=HashMap<java.util.UUID,net.minecraft.core.BlockPos>()
     val mirrorRelay=TelevisionRelay()
     var tvServerStatus="OFF"
     private val history=ArrayList<String>()
@@ -51,18 +55,20 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         electricalProcessList.add(IProcess(::account))
         slowProcessList.add(NodePeriodicPublishProcess(node,1.0,.5))
     }
-    override fun initialize() { connect() }
+    override fun initialize() { SpeakerLinks.register(this);connect() }
     override fun onNeighborBlockChange() { super.onNeighborBlockChange();(transparentNodeDescriptor as MediaDescriptor).checkWallSupport(this) }
-    private fun loadedWorld(): ServerLevel? {
+    internal fun loadedWorld(): ServerLevel? {
         val c=node?.coordinate ?: return null
         return DimensionIds.serverLevel(c.dimension)?.takeIf { it.chunkSource.getChunkNow(c.x shr 4,c.z shr 4)!=null }
     }
     internal fun prepare(loaded: Boolean=loadedWorld()!=null) {
-        working=enabled && !trip && loaded && signal.normalized<.6 && mediaRequested && kind.address(mediaUrl)!=null
+        SpeakerLinks.register(this)
+        working=enabled && !trip && loaded && signal.normalized<.6 && mediaRequested && address(mediaUrl)!=null
         var demand=if(working)kind.watts else if(enabled)2.0 else 0.0
         working=working && abs(input.voltage)>=nominal*.8
         if(!input.voltage.isFinite() || abs(input.voltage)>nominal*1.3) { working=false;demand=0.0 }
-        if(kind==MediaKind.TV) { if(!working)mods.eamedia.web.WebRoutingNetwork.revoke(sharedTv.session);sharedTv.running(working);if(!working || sharedTv.activeViewers.isEmpty())mirrorRelay.drop() }
+        if(!usesBrowser) { mods.eamedia.web.WebRoutingNetwork.revoke(sharedTv.session);sharedTv.running(false) }
+        if(usesBrowser) { if(!working)mods.eamedia.web.WebRoutingNetwork.revoke(sharedTv.session);sharedTv.running(working);if(!working || sharedTv.activeViewers.isEmpty())mirrorRelay.drop() }
         resistor.resistance=IndustrialEnergy.resistance(nominal,demand)
         tripSource.state(trip)
     }
@@ -73,11 +79,20 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     }
     fun setEnabled(value: Boolean) { enabled=value;prepare();needPublish() }
     override fun setRemoteEnabled(enabled: Boolean)=setEnabled(enabled)
-    fun playMedia(value: String)=playMedia(value,true)
+    private fun address(value: String)=if(usesBrowser)TelevisionUrl.parse(value) else kind.address(value)
+    fun setChannel(channel: Int) { if(kind==MediaKind.JUKEBOX && channel in 1..9999) { speakerChannel=channel;needPublish() } }
+    fun playBrowser(value: String): Boolean {
+        if(kind!=MediaKind.JUKEBOX)return playMedia(value,true)
+        val uri=TelevisionUrl.parse(value) ?: return false
+        // Entry URLs may be shared. Authentication redirects stay inside the operator's browser.
+        if(uri.rawQuery!=null || uri.rawFragment?.contains("token",true)==true)return false
+        browserMode=true;return playMedia(value,true)
+    }
+    fun playMedia(value: String): Boolean { if(kind==MediaKind.JUKEBOX) { if(WebAudioUrl.parse(value)==null)return false;browserMode=false };return playMedia(value,true) }
     private fun playMedia(value: String,remember: Boolean): Boolean {
-        val url=kind.address(value) ?: return false
+        val url=address(value) ?: return false
         mediaUrl=url.toASCIIString();mediaRequested=true;mediaRevision++
-        if(kind==MediaKind.TV) {
+        if(usesBrowser) {
             sharedTv.navigate()
             if(remember && history.getOrNull(historyIndex)!=mediaUrl) {
                 while(history.size>historyIndex+1)history.removeAt(history.lastIndex)
@@ -90,6 +105,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         ServerTelevisions.navigate(this,action)
     }
     internal fun browserPageChanged(url: String) {
+        if(kind==MediaKind.JUKEBOX)return
         if(mediaUrl==url)return
         mediaUrl=url
         if(history.getOrNull(historyIndex)!=url){while(history.size>historyIndex+1)history.removeAt(history.lastIndex);history.add(url);if(history.size>32)history.removeAt(0);historyIndex=history.lastIndex}
@@ -113,8 +129,9 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         tag.merge(legacy.copy())
         settings.forEachIndexed { i,v->tag.putDouble("industrialSetting$i",v) }
         tag.putBoolean("industrialEnabled",enabled);tag.putBoolean("industrialTrip",trip);tag.putDouble("industrialLifetime",lifetimeJoules)
+        tag.putInt("speakerChannel",speakerChannel);tag.putBoolean("jukeboxBrowser",browserMode)
         tag.putString("mediaUrl",mediaUrl);tag.putBoolean("mediaRequested",mediaRequested);tag.putInt("mediaRevision",mediaRevision);cord.write(tag)
-        if(kind==MediaKind.TV) {
+        if(usesBrowser) {
             sharedTv.write(tag);val urls=net.minecraft.nbt.ListTag();history.forEach { urls.add(net.minecraft.nbt.StringTag.valueOf(it)) }
             tag.put("televisionHistory",urls);tag.putInt("televisionHistoryIndex",historyIndex)
         }
@@ -125,8 +142,9 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
         if(kind.valid(p))settings=p
         enabled=!tag.contains("industrialEnabled") || tag.getBoolean("industrialEnabled");trip=tag.getBoolean("industrialTrip")
         lifetimeJoules=tag.getDouble("industrialLifetime").takeIf { it.isFinite() && it>=0 } ?: 0.0
-        mediaUrl=tag.getString("mediaUrl").takeIf { kind.address(it)!=null } ?: "";mediaRequested=tag.getBoolean("mediaRequested");mediaRevision=tag.getInt("mediaRevision")
-        if(kind==MediaKind.TV) {
+        speakerChannel=tag.getInt("speakerChannel").takeIf { it in 1..9999 } ?: 1;browserMode=kind==MediaKind.JUKEBOX && tag.getBoolean("jukeboxBrowser")
+        mediaUrl=tag.getString("mediaUrl").takeIf { address(it)!=null } ?: "";mediaRequested=tag.getBoolean("mediaRequested");mediaRevision=tag.getInt("mediaRevision")
+        if(usesBrowser) {
             sharedTv.read(tag);history.clear()
             val urls=tag.getList("televisionHistory",8);for(i in 0 until minOf(32,urls.size))TelevisionUrl.parse(urls.getString(i))?.toASCIIString()?.let(history::add)
             historyIndex=tag.getInt("televisionHistoryIndex").coerceIn(-1,history.lastIndex)
@@ -141,7 +159,8 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
     override fun networkSerialize(out: DataOutputStream) {
         super.networkSerialize(out);settings.forEach(out::writeDouble);out.writeBoolean(enabled);out.writeBoolean(trip);out.writeBoolean(working)
         out.writeDouble(input.voltage);out.writeDouble(resistor.power);out.writeUTF(mediaUrl);out.writeBoolean(mediaRequested);out.writeInt(mediaRevision)
-        if(kind==MediaKind.TV) {
+        out.writeInt(speakerChannel);out.writeBoolean(browserMode)
+        run {
             out.writeUTF(sharedTv.session.toString());out.writeUTF(sharedTv.controller?.toString() ?: "");out.writeBoolean(sharedTv.interactive)
             out.writeUTF(sharedTv.host?.toString() ?: "");out.writeUTF(sharedTv.hostEpoch.toString())
             val s=sharedTv.snapshot();out.writeDouble(s.position);out.writeBoolean(s.paused);out.writeDouble(s.rate);out.writeDouble(s.duration);out.writeBoolean(s.live);out.writeBoolean(s.known)
@@ -157,6 +176,7 @@ class MediaElement(node: TransparentNode,descriptor: TransparentNodeDescriptor):
             82->{ trip=false;prepare();needPublish() }
             86->{ val url=input.readUTF();if(kind!=MediaKind.TV)playMedia(url) }
             87->stopMedia()
+            88->setChannel(input.readInt())
         }
         return id
     }

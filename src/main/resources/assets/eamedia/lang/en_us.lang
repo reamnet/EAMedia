@@ -1,8 +1,9 @@
 #<ELN_LANGFILE_V1_1>
 
 # Appearing in multiple source files
+Status=Status
+Stop=Stop
 Supply\:_%1$;_%2$;_volume_%3$_percent=Supply: %1$; %2$; volume %3$ percent
-Waiting_for_electrical_power=Waiting for electrical power
 
 # Jade integration settings
 config.jade.plugin_eln.ghost_node=Multiblock parts
@@ -16,10 +17,13 @@ Verifying_bundled_Chromium...=Verifying bundled Chromium...
 Disable=Disable
 Enable=Enable
 HTTPS_audio_or_YouTube_address=HTTPS audio or YouTube address
+Open_browser_controls=Open browser controls
 Play_/_restart=Play / restart
 Powered_Web_Jukebox=Powered Web Jukebox
+Private_Plex_/_web_player=Private Plex / web player
 Reset_trip=Reset trip
-Stop=Stop
+Set_speaker_channel=Set speaker channel
+Speaker_channel=Speaker channel
 Use_a_complete_HTTPS_audio_or_YouTube_address=Use a complete HTTPS audio or YouTube address
 
 # src/main/kotlin/mods/eamedia/MediaClient.kt
@@ -33,19 +37,33 @@ Wall-mounted_Browser_Television.name=Wall-mounted Browser Television
 Disabled=Disabled
 Enabled=Enabled
 Power=Power
-Status=Status
 Supply=Supply
 
 # src/main/kotlin/mods/eamedia/MediaKind.kt
 Powered_Browser_Television.name=Powered Browser Television
 Powered_Web_Jukebox.name=Powered Web Jukebox
 
+# src/main/kotlin/mods/eamedia/Speakers.kt
+Apply=Apply
+Channel=Channel
+Jukebox_speaker=Jukebox speaker
+Match_the_jukebox's_channel;_nearest_loaded_source_within_64_blocks=Match the jukebox's channel; nearest loaded source within 64 blocks
+Passive_audio_endpoint\:_no_separate_electrical_connection;_Records_volume_slider=Passive audio endpoint: no separate electrical connection; Records volume slider
+Playing=Playing
+Playing;_volume_%1$%=Playing; volume %1$%
+Volume_+=Volume +
+Volume_-=Volume -
+Waiting_for_linked_jukebox=Waiting for linked jukebox
+
 # src/main/kotlin/mods/eamedia/TelevisionBrowser.kt
+Audio-only_jukebox;_the_private_browser_belongs_to_its_hosting_player=Audio-only jukebox; the private browser belongs to its hosting player
 Browser_could_not_start;_turn_the_TV_off_and_on_to_retry=Browser could not start; turn the TV off and on to retry
 Browser_engine_unavailable;_check_MCEF_setup=Browser engine unavailable; check MCEF setup
+Enter_a_player_address_and_press_Play=Enter a player address and press Play
 Enter_a_webpage_or_video_address_and_turn_on_the_TV=Enter a webpage or video address and turn on the TV
 Install_the_full_EA_Media_jar_on_the_server_for_TV_playback=Install the full EA Media jar on the server for TV playback
 Loading_webpage...=Loading webpage...
+Private_controls;_nearby_listeners_receive_audio_only=Private controls; nearby listeners receive audio only
 Server_browser_failed;_check_its_worker_log=Server browser failed; check its worker log
 Shared_TV;_take_control_to_interact=Shared TV; take control to interact
 Shared_TV;_you_control_the_browser=Shared TV; you control the browser
@@ -54,20 +72,25 @@ The_server_has_disabled_TV_web_routing=The server has disabled TV web routing
 The_server_needs_Xvfb_for_its_browser;_see_server_setup=The server needs Xvfb for its browser; see server setup
 This_website_is_not_approved_by_the_server=This website is not approved by the server
 Two_nearby_TVs_are_already_active=Two nearby TVs are already active
+Waiting_for_electrical_power=Waiting for electrical power
 Waiting_for_the_server_web_route=Waiting for the server web route
 Waiting_for_the_shared_TV_picture=Waiting for the shared TV picture
 Waiting_for_viewer_within_32_blocks=Waiting for viewer within 32 blocks
 
 # src/main/kotlin/mods/eamedia/TelevisionScreen.kt
+Ask_the_server_owner_to_configure_a_local_Plex_server=Ask the server owner to configure a local Plex server
 Go=Go
+Local_Plex=Local Plex
+Open_the_configured_local_Plex_server=Open the configured local Plex server
+Play=Play
 Powered_Browser_Television=Powered Browser Television
+Private_jukebox_browser_-_audio_only=Private jukebox browser - audio only
 Reload=Reload
-TV_off=TV off
-TV_on=TV on
 Take_control=Take control
 Use_a_complete_HTTP_or_HTTPS_address=Use a complete HTTP or HTTPS address
+Use_the_player_home_address;_sign_in_inside_the_private_browser=Use the player home address; sign in inside the private browser
 Web_address=Web address
-You_control_TV=You control TV
+Your_controls=Your controls
 
 # src/main/kotlin/mods/eamedia/WebJukeboxAudio.kt
 Audio_unavailable;_check_link,_HTTPS_access_and_media_tools=Audio unavailable; check link, HTTPS access and media tools
@@ -77,10 +100,11 @@ Could_not_prepare_bundled_audio_decoder=Could not prepare bundled audio decoder
 Downloading_selected_audio...=Downloading selected audio...
 Extracting_bundled_media_tools...=Extracting bundled media tools...
 Four_web_audio_players_are_already_active=Four web audio players are already active
-Paste_a_HTTPS_audio_/_YouTube_link_and_press_Play=Paste a HTTPS audio / YouTube link and press Play
 Playing_web_audio=Playing web audio
 Preparing_web_audio...=Preparing web audio...
+Private_browser_audio;_nearby_speakers_share_sound_only=Private browser audio; nearby speakers share sound only
 Song_finished;_press_Play_to_restart=Song finished; press Play to restart
-Waiting_for_listener_within_32_blocks=Waiting for listener within 32 blocks
+Waiting_for_electrical_power_and_playback=Waiting for electrical power and playback
+Waiting_for_listener_within_32_blocks_of_a_speaker=Waiting for listener within 32 blocks of a speaker
 Web_audio_muted;_check_volume_/_Records_slider=Web audio muted; check volume / Records slider
 Web_audio_stopped=Web audio stopped
